@@ -3,18 +3,23 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#230c18">
 <title>Happy 65th Birthday!</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;700&family=Lato:wght@400;700&display=swap" rel="stylesheet">
 <style>
   :root {
-    --ivory: #FDFBF7;
-    --gold: #d7b545;
-    --navy: #1A2B4C;
-    --white: #FFFFFF;
-    --mist: #F3EEE2;
-    --shadow: 0 18px 48px rgba(26, 43, 76, .14);
+    /* Burgundy and champagne: a warm, formal celebration palette */
+    --wine-deep: #230c18;
+    --wine: #3a1428;
+    --wine-glow: #5a2038;
+    --ivory: #f8f1e4;
+    --gold: #d9b873;
+    --gold-deep: #b48f4b;
+    --paper: #fbf6ec;
+    --ink: #2b1020;
+    --rose: #f2a79f;
     --serif: 'Playfair Display', Georgia, 'Times New Roman', serif;
     --sans: 'Lato', 'Helvetica Neue', Arial, sans-serif;
     --ease: cubic-bezier(.22, .61, .36, 1);
@@ -22,37 +27,47 @@
   * { box-sizing: border-box; margin: 0; }
   html, body { height: 100%; }
   body {
-    background: var(--ivory);
-    color: var(--navy);
-    font: 400 clamp(20px, 2.2vw, 24px)/1.6 var(--sans);
+    background: var(--wine-deep);
+    color: var(--ivory);
+    font: 400 clamp(22px, calc(2.2vw + 2px), 26px)/1.6 var(--sans);
     overflow: hidden;
+    -webkit-font-smoothing: antialiased;
   }
   .stage {
     position: fixed; inset: 0;
     display: grid; place-items: center;
     padding: clamp(16px, 4vw, 48px);
-    background: var(--ivory);
+    background: radial-gradient(ellipse at 50% 38%, var(--wine-glow) 0%, var(--wine) 48%, var(--wine-deep) 100%);
     opacity: 0; visibility: hidden;
     transition: opacity 1.4s ease, visibility 0s 1.4s;
   }
   .stage.on { opacity: 1; visibility: visible; transition: opacity 1.4s ease; }
+
+  /* Fine champagne frame, like a formal invitation */
+  .stage:not(#player)::after {
+    content: ""; position: absolute;
+    inset: clamp(12px, 2vw, 26px);
+    border: 1px solid rgba(217, 184, 115, .38);
+    border-radius: 4px;
+    pointer-events: none;
+  }
 
   .card {
     width: min(920px, 100%);
     text-align: center;
   }
   h1 {
-    font: 700 clamp(40px, 7vw, 76px)/1.15 var(--serif);
-    color: var(--navy);
+    font: 700 clamp(42px, calc(7vw + 2px), 78px)/1.15 var(--serif);
+    color: var(--ivory);
   }
   .rule {
-    width: 96px; height: 3px; background: var(--gold);
-    margin: 28px auto; border-radius: 2px;
+    width: 140px; height: 2px; margin: 28px auto; border-radius: 2px;
+    background: linear-gradient(90deg, transparent, var(--gold) 25%, var(--gold) 75%, transparent);
     transform-origin: center;
   }
-  .sub { font-size: clamp(22px, 2.8vw, 30px); }
-  .sub strong { font-family: var(--serif); font-weight: 500; }
-  .body { max-width: 34ch; margin: 0 auto; font-size: clamp(22px, 2.6vw, 28px); }
+  .sub { font-size: clamp(24px, calc(2.8vw + 2px), 32px); }
+  .sub strong { font-family: var(--serif); font-weight: 500; color: var(--gold); }
+  .body { max-width: 34ch; margin: 0 auto; font-size: clamp(24px, calc(2.6vw + 2px), 30px); }
 
   /* Intro and outro: soft focus-in reveal, gold line draws from the center */
   .stage.on .card > * { animation: reveal 1.8s var(--ease) both; }
@@ -71,7 +86,7 @@
   /* Outro: more breathing room */
   #outro .card { width: min(1240px, 100%); padding: clamp(24px, 5vh, 64px) clamp(8px, 3vw, 40px); }
   #outro h1 {
-    font-size: clamp(26px, 3.7vw, 48px);
+    font-size: clamp(28px, calc(3.7vw + 2px), 50px);
     line-height: 1.3;
     letter-spacing: .01em;
     margin: 0 auto;
@@ -80,7 +95,7 @@
   #outro .rule { margin: clamp(28px, 5vh, 48px) auto; }
   #outro .body {
     max-width: 68ch;
-    font-size: clamp(18px, 1.9vw, 24px);
+    font-size: clamp(20px, calc(1.9vw + 2px), 26px);
     line-height: 1.8;
     text-wrap: balance;
   }
@@ -97,14 +112,533 @@
   }
   video.fade { opacity: 0; }
 
+  /* ---------- Lock screen with a new-message notification ---------- */
+  #lock::after { display: none; }
+  .lockscreen {
+    width: min(430px, 100%); padding-bottom: 10vh;
+    display: flex; flex-direction: column; align-items: center; text-align: center;
+  }
+  .ls-icon { margin-bottom: 12px; color: var(--gold); opacity: .9; }
+  .ls-time { font: 500 clamp(74px, calc(18vw + 2px), 106px)/1 var(--serif); color: var(--ivory); }
+  .ls-date { margin-top: 8px; font-size: 22px; color: rgba(248, 241, 228, .75); }
+  .notif {
+    margin-top: 48px; width: 100%; display: flex; align-items: center; gap: 14px;
+    padding: 14px 16px; text-align: left; cursor: pointer; color: var(--ivory);
+    border-radius: 22px; border: 1px solid rgba(217, 184, 115, .4);
+    background: rgba(248, 241, 228, .13);
+    backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px);
+    box-shadow: 0 14px 34px rgba(0, 0, 0, .4); font-family: var(--sans);
+    animation: notifIn .6s cubic-bezier(.3, 1.4, .5, 1) both, notifBuzz .5s ease .65s;
+    transition: transform .15s ease;
+  }
+  .notif[hidden] { display: none; }
+  .notif:active { transform: scale(.97); }
+  .notif:focus-visible { outline: 3px solid var(--gold); outline-offset: 3px; }
+  .notif .ntext { flex: 1; min-width: 0; line-height: 1.3; }
+  .notif .ntext strong { display: block; font-size: 20px; }
+  .notif .ntext span { font-size: 18px; color: rgba(248, 241, 228, .8); }
+  .notif em { align-self: flex-start; font-style: normal; font-size: 15px; color: rgba(248, 241, 228, .6); }
+  @keyframes notifIn { from { opacity: 0; transform: translateY(-40px) scale(.96); } }
+  @keyframes notifBuzz {
+    0%, 100% { transform: none; }
+    20% { transform: translateX(-5px) rotate(-.6deg); }
+    40% { transform: translateX(5px) rotate(.6deg); }
+    60% { transform: translateX(-3px); }
+    80% { transform: translateX(2px); }
+  }
+  .ls-hint { margin-top: 18px; font-size: 18px; color: var(--gold); opacity: 0; animation: hintIn .6s ease 1.2s forwards; }
+  .ls-hint[hidden] { display: none; }
+  @keyframes hintIn { to { opacity: .9; } }
+
+  /* ---------- Opening: a private message with the invitation ---------- */
+  #chat { padding: clamp(0px, 3vw, 28px); }
+  #chat::after { display: none; }
+  .phone {
+    width: min(430px, 100%); height: min(780px, 100%);
+    display: flex; flex-direction: column; overflow: hidden;
+    border-radius: 26px; border: 1px solid rgba(217, 184, 115, .35);
+    background: linear-gradient(180deg, #2c1021, #210a17);
+    box-shadow: 0 30px 70px rgba(0, 0, 0, .45);
+  }
+  @media (max-width: 480px) {
+    #chat { padding: 0; }
+    .phone { width: 100%; height: 100%; border-radius: 0; border: 0; }
+  }
+  .chat-head {
+    display: flex; align-items: center; gap: 12px; padding: 14px 16px;
+    border-bottom: 1px solid rgba(217, 184, 115, .2); color: var(--gold);
+  }
+  .chat-head .ico:first-child { margin-right: -2px; }
+  .avatar {
+    width: 42px; height: 42px; border-radius: 50%; display: grid; place-items: center;
+    background: linear-gradient(180deg, #ecd29a, var(--gold-deep)); color: var(--ink);
+    font: 700 18px var(--serif); letter-spacing: .02em;
+  }
+  .who { flex: 1; min-width: 0; line-height: 1.25; text-align: left; }
+  .who strong { display: block; font: 700 19px var(--sans); color: var(--ivory); }
+  .who span { font-size: 15px; color: rgba(248, 241, 228, .65); }
+  .who span::before {
+    content: ""; display: inline-block; width: 8px; height: 8px; margin-right: 6px;
+    border-radius: 50%; background: #7fd6a0; vertical-align: 0;
+  }
+  .chat-msgs {
+    flex: 1; min-height: 0; display: flex; flex-direction: column; gap: 8px;
+    padding: 16px 16px 12px; overflow-y: auto; scrollbar-width: none;
+  }
+  .chat-msgs::-webkit-scrollbar { display: none; }
+  .chat-msgs > :first-child { margin-top: auto; }
+  .day {
+    align-self: center; margin-bottom: 6px; padding: 3px 12px; border-radius: 999px;
+    font-size: 15px; color: rgba(248, 241, 228, .6); background: rgba(248, 241, 228, .08);
+  }
+  .bubble {
+    max-width: 78%; padding: 10px 15px; font-size: 19px; line-height: 1.4; text-align: left;
+    border-radius: 20px; animation: pop .35s var(--ease) both;
+  }
+  .bubble.in { align-self: flex-start; border-bottom-left-radius: 6px; background: rgba(248, 241, 228, .12); color: var(--ivory); transform-origin: left bottom; }
+  .bubble.out { align-self: flex-end; border-bottom-right-radius: 6px; background: linear-gradient(180deg, #e6c98a, var(--gold-deep)); color: var(--ink); transform-origin: right bottom; }
+  @keyframes pop { from { opacity: 0; transform: translateY(10px) scale(.92); } }
+  .typing { display: flex; gap: 5px; padding: 14px 16px; }
+  .typing i { width: 8px; height: 8px; border-radius: 50%; background: rgba(248, 241, 228, .75); animation: dot 1s ease-in-out infinite; }
+  .typing i:nth-child(2) { animation-delay: .15s; }
+  .typing i:nth-child(3) { animation-delay: .3s; }
+  @keyframes dot { 0%, 60%, 100% { transform: none; opacity: .45; } 30% { transform: translateY(-5px); opacity: 1; } }
+
+  /* The invitation attachment */
+  .invite {
+    align-self: flex-start; width: min(290px, 82%); padding: 0; border: 0; overflow: hidden;
+    border-radius: 20px; border-bottom-left-radius: 6px; text-align: left; cursor: pointer;
+    background: var(--paper); color: var(--ink); font-family: var(--sans);
+    box-shadow: 0 8px 22px rgba(0, 0, 0, .35);
+    animation: pop .4s var(--ease) both;
+    transition: transform .2s var(--ease), filter .2s ease;
+  }
+  .invite.ready { animation: pop .4s var(--ease) both, ring 1.6s ease-out .4s infinite; }
+  @keyframes ring { from { box-shadow: 0 8px 22px rgba(0, 0, 0, .35), 0 0 0 0 rgba(217, 184, 115, .6); } to { box-shadow: 0 8px 22px rgba(0, 0, 0, .35), 0 0 0 16px rgba(217, 184, 115, 0); } }
+  .invite:hover { filter: brightness(1.04); }
+  .invite:focus-visible { outline: 3px solid var(--gold); outline-offset: 3px; }
+  .invite.pressed { transform: scale(.95); filter: brightness(.92); animation: none; }
+  .invite .art {
+    height: 112px; display: grid; place-items: center; border-bottom: 3px solid var(--gold);
+    background: radial-gradient(ellipse at 50% 35%, var(--wine-glow), var(--wine-deep));
+  }
+  .invite .art svg { width: 76px; height: 76px; transform-origin: 50% 90%; animation: wiggle 2.6s ease-in-out infinite; }
+  @keyframes wiggle {
+    0%, 62%, 100% { transform: none; }
+    68% { transform: rotate(-6deg) scale(1.04); }
+    74% { transform: rotate(6deg) scale(1.04); }
+    80% { transform: rotate(-4deg); }
+    86% { transform: rotate(3deg); }
+  }
+  .invite .tw { animation: twinkle 1.8s ease-in-out infinite; }
+  .invite .tw.t2 { animation-delay: .6s; }
+  .invite .tw.t3 { animation-delay: 1.1s; }
+  @keyframes twinkle { 0%, 100% { opacity: .25; } 50% { opacity: 1; } }
+  .invite .meta { display: block; padding: 12px 14px 4px; }
+  .invite .meta strong { display: block; font: 700 20px/1.25 var(--serif); }
+  .invite .meta span { display: block; margin-top: 2px; font-size: 16px; color: #6b5560; }
+  .invite .cta {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 8px 14px 13px; font-size: 16px; font-weight: 700; color: #8a6a2c;
+  }
+  .composer {
+    display: flex; align-items: center; gap: 12px; padding: 12px 16px 16px;
+    border-top: 1px solid rgba(217, 184, 115, .2); color: var(--gold);
+  }
+  .composer .plus { font: 400 30px/1 var(--sans); width: 24px; text-align: center; }
+  .composer .type {
+    flex: 1; padding: 10px 16px; border-radius: 999px; text-align: left;
+    background: rgba(248, 241, 228, .09); color: rgba(248, 241, 228, .45); font-size: 18px;
+  }
+
+  .composer .type.live { color: var(--ivory); }
+  .composer .type.live::after {
+    content: ""; display: inline-block; width: 2px; height: 1.1em; margin-left: 2px;
+    background: var(--gold); vertical-align: -3px; animation: blink 1s steps(1) infinite;
+  }
+  @keyframes blink { 50% { opacity: 0; } }
+  /* On-screen keyboard that slides up while she types her reply */
+  .kbd-wrap {
+    position: relative; z-index: 2; flex: none; height: 0; overflow: hidden;
+    background: #170711; border-top: 1px solid rgba(217, 184, 115, .22);
+    transition: height .45s var(--ease);
+  }
+  .kbd-wrap.show { height: clamp(196px, 30vh, 268px); }
+  .kbd-wrap.open { overflow: visible; }
+  .kbd { height: 100%; display: flex; flex-direction: column; gap: 7px; padding: 8px 5px 12px; }
+  .krow { flex: 1; min-height: 0; display: flex; gap: 5px; justify-content: center; }
+  .krow.indent { padding: 0 5%; }
+  .key {
+    position: relative; flex: 1 1 0; min-width: 0; display: grid; place-items: center;
+    border-radius: 7px; background: rgba(248, 241, 228, .16); color: var(--ivory);
+    font: 400 22px/1 var(--sans); user-select: none;
+    transition: background .08s ease, transform .08s ease;
+  }
+  .key.fn { background: rgba(248, 241, 228, .08); font-size: 17px; }
+  .key.w15 { flex: 1.5 1 0; }
+  .key.w2 { flex: 2 1 0; }
+  .key.w5 { flex: 5 1 0; font-size: 17px; }
+  .key.send { background: linear-gradient(180deg, #e6c98a, var(--gold-deep)); color: var(--ink); font: 700 17px var(--sans); }
+  .key.on { background: var(--gold); color: var(--ink); }
+  .kbd.shift .key.alpha .lbl { text-transform: uppercase; }
+  .key.down { background: rgba(248, 241, 228, .42); transform: scale(.94); }
+  .key.send.down { filter: brightness(.9); }
+  .key .pop {
+    position: absolute; bottom: 92%; left: 50%; z-index: 6; min-width: 150%; padding: 9px 0 11px;
+    transform: translate(-50%, 6px); opacity: 0; pointer-events: none;
+    border-radius: 9px; background: var(--paper); color: var(--ink); text-align: center;
+    font: 400 28px/1 var(--sans); box-shadow: 0 6px 16px rgba(0, 0, 0, .4);
+    transition: opacity .06s ease, transform .06s ease;
+  }
+  .kbd.shift .key.alpha .pop { text-transform: uppercase; }
+  .key.alpha.down .pop { opacity: 1; transform: translate(-50%, 0); }
+
+  /* The tapping finger, tap ripple and the launch reveal */
+  .finger {
+    position: fixed; z-index: 15; width: 38px; height: 38px; margin: -19px 0 0 -19px;
+    border-radius: 50%; background: rgba(248, 241, 228, .35); border: 2px solid rgba(248, 241, 228, .9);
+    box-shadow: 0 4px 14px rgba(0, 0, 0, .4); opacity: 0; pointer-events: none;
+    transition: left .95s cubic-bezier(.45, .05, .25, 1), top .95s cubic-bezier(.45, .05, .25, 1), opacity .3s ease, transform .15s ease, background .15s ease;
+  }
+  .finger.show { opacity: 1; }
+  .finger.tap { transform: scale(.7); background: rgba(248, 241, 228, .65); }
+  .ripple {
+    position: fixed; z-index: 14; width: 22px; height: 22px; margin: -11px 0 0 -11px;
+    border-radius: 50%; border: 2px solid var(--gold); opacity: 0; pointer-events: none;
+  }
+  .ripple.go { animation: rip .6s ease-out; }
+  @keyframes rip { from { opacity: .9; transform: scale(.4); } to { opacity: 0; transform: scale(4.5); } }
+  #launch {
+    position: fixed; inset: 0; z-index: 20; visibility: hidden; pointer-events: none;
+    background: radial-gradient(ellipse at 50% 38%, var(--wine-glow) 0%, var(--wine) 48%, var(--wine-deep) 100%);
+    clip-path: circle(0 at var(--x, 50%) var(--y, 50%));
+  }
+  #launch.go { visibility: visible; clip-path: circle(150vmax at var(--x, 50%) var(--y, 50%)); transition: clip-path .85s var(--ease); }
+  #launch.out { opacity: 0; transition: opacity 1.2s ease; }
+
+  /* ---------- Unwrapping: the gift opens by itself ---------- */
+  #welcome .welcome-card {
+    position: relative; z-index: 1; width: min(560px, 100%);
+    display: flex; flex-direction: column; align-items: center; text-align: center;
+  }
+  .stage.on .welcome-card > * { animation: fadeUp 1s var(--ease) backwards; }
+  .stage.on .welcome-card > :nth-child(2) { animation-delay: .35s; }
+  .stage.on .welcome-card > :nth-child(3) { animation-delay: .55s; }
+  .stage.on .welcome-card > .giftbox { animation: giftIn .9s cubic-bezier(.3, 1.5, .5, 1) backwards; }
+  @keyframes fadeUp { from { opacity: 0; transform: translateY(14px); } }
+  @keyframes giftIn { from { opacity: 0; transform: scale(.4) translateY(30px); } }
+
+  .giftbox { position: relative; width: clamp(150px, 34vw, 200px); aspect-ratio: 1; margin-bottom: 14px; }
+  .gift-svg { width: 100%; height: 100%; overflow: visible; filter: drop-shadow(0 14px 22px rgba(0, 0, 0, .4)); }
+  .giftbox.shake .gift-svg { transform-origin: 50% 95%; animation: shakeBox .2s ease-in-out 7; }
+  @keyframes shakeBox {
+    0%, 100% { transform: none; }
+    25% { transform: rotate(-5deg) translateX(-3px); }
+    75% { transform: rotate(5deg) translateX(3px); }
+  }
+  .gb-lid { transform-box: fill-box; transform-origin: 0% 100%; transition: transform .7s cubic-bezier(.3, 1.4, .5, 1); }
+  .gb-bow { transform-box: fill-box; transform-origin: 50% 100%; transition: transform .9s var(--ease), opacity .7s ease; }
+  .giftbox.open .gb-lid { transform: translate(-8px, -46px) rotate(-16deg); }
+  .giftbox.open .gb-bow { transform: translateY(-54px) rotate(25deg) scale(.8); opacity: 0; }
+  .glow {
+    position: absolute; left: 50%; top: 44%; width: 170%; aspect-ratio: 1; z-index: -1;
+    transform: translate(-50%, -50%) scale(.3); opacity: 0; pointer-events: none;
+    background: radial-gradient(circle, rgba(236, 210, 154, .55) 0, rgba(236, 210, 154, 0) 62%);
+    transition: opacity .8s ease, transform .9s var(--ease);
+  }
+  .giftbox.open .glow { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+  .giftbox .spark { top: 40%; }
+  .giftbox.open .spark { animation: burst 1s var(--ease) .1s both; }
+  .welcome-title { font: 700 clamp(30px, calc(5.4vw + 2px), 44px)/1.2 var(--serif); color: var(--ivory); transition: opacity .25s ease; }
+  .welcome-sub { margin-top: 6px; font-size: clamp(20px, calc(2.4vw + 2px), 24px); color: rgba(248, 241, 228, .8); transition: opacity .25s ease; }
+
+  /* ---------- Password gate: date dials ---------- */
+  #gate .gate-card {
+    position: relative; z-index: 1;
+    width: min(520px, 100%);
+    text-align: center;
+  }
+  .lock-wrap { position: relative; width: 112px; height: 130px; margin: 0 auto 6px; }
+  .lock { width: 100%; height: 100%; overflow: visible; filter: drop-shadow(0 10px 18px rgba(0, 0, 0, .35)); }
+  .lock .shackle {
+    fill: none; stroke: var(--gold); stroke-width: 9; stroke-linecap: round;
+    transform-box: fill-box; transform-origin: 100% 100%;
+    transition: transform .7s var(--ease);
+  }
+  .lock .body-rect { fill: url(#goldGrad); }
+  .lock .plate { fill: var(--wine); }
+  .lock .keyhole { fill: var(--gold); }
+  .lock-wrap.open .shackle { transform: translateY(-14px) rotate(-28deg); }
+  .lock-wrap.open .plate { animation: glow 1s ease both; }
+  @keyframes glow { 50% { filter: drop-shadow(0 0 10px var(--gold)); } }
+
+  .lock-wrap.shake { animation: shake .5s var(--ease); }
+  @keyframes shake {
+    0%, 100% { transform: translateX(0) rotate(0); }
+    20% { transform: translateX(-12px) rotate(-6deg); }
+    40% { transform: translateX(10px) rotate(5deg); }
+    60% { transform: translateX(-7px) rotate(-3deg); }
+    80% { transform: translateX(4px) rotate(2deg); }
+  }
+  .lock-wrap:not(.open):not(.shake) .lock { animation: bob 3.2s ease-in-out infinite; }
+  @keyframes bob { 50% { transform: translateY(-5px); } }
+
+  .spark {
+    position: absolute; left: 50%; top: 58%;
+    width: 10px; height: 10px; margin: -5px;
+    background: var(--gold); border-radius: 50%;
+    opacity: 0; pointer-events: none;
+  }
+  .lock-wrap.open .spark { animation: burst .9s var(--ease) .15s both; }
+  @keyframes burst {
+    0% { opacity: 1; transform: translate(0, 0) scale(1); }
+    100% { opacity: 0; transform: translate(var(--dx), var(--dy)) scale(.2); }
+  }
+
+  .gate-title { font: 700 clamp(28px, calc(5vw + 2px), 38px)/1.2 var(--serif); margin-top: 6px; color: var(--ivory); }
+  .gate-sub { font-size: 21px; margin-top: 4px; color: rgba(248, 241, 228, .8); }
+
+  /* A hint that the password is her date of birth */
+  .hint-card {
+    display: flex; align-items: center; gap: 14px; text-align: left;
+    max-width: 100%; margin: 18px auto 16px; padding: 12px 20px 12px 16px;
+    border: 1px solid rgba(217, 184, 115, .5); border-radius: 14px;
+    background: rgba(248, 241, 228, .06);
+  }
+  .hint-card svg { flex: none; width: 36px; height: 36px; color: var(--gold); }
+  .hint-card small {
+    display: block; margin-bottom: 6px;
+    font: 700 14px/1 var(--sans); letter-spacing: .28em; text-transform: uppercase;
+    color: rgba(248, 241, 228, .65);
+  }
+  .hint-card strong { font: 700 clamp(20px, calc(4.8vw + 2px), 24px)/1.3 var(--serif); color: var(--ivory); }
+  .hint-card em { font-style: normal; color: var(--gold); }
+
+  /* Combination-style date dials */
+  .dials { display: grid; grid-template-columns: 1.55fr 1fr 1.2fr; gap: 10px; }
+  .dial {
+    padding: 4px; border-radius: 16px; outline: none;
+    background: rgba(0, 0, 0, .25); border: 1.5px solid rgba(217, 184, 115, .3);
+    transition: border-color .3s ease, box-shadow .3s ease, background .3s ease;
+  }
+  .dial:focus-visible { outline: 3px solid var(--gold); outline-offset: 3px; }
+  .dial.set {
+    border-color: var(--gold); background: rgba(217, 184, 115, .12);
+    box-shadow: 0 0 0 3px rgba(217, 184, 115, .14), 0 0 24px rgba(217, 184, 115, .35);
+  }
+  .cap {
+    display: block; padding: 6px 0 0;
+    font: 700 13px/1 var(--sans); letter-spacing: .24em; text-transform: uppercase;
+    color: rgba(248, 241, 228, .6); transition: color .3s ease;
+  }
+  .dial.set .cap { color: var(--gold); }
+  .step {
+    display: grid; place-items: center; width: 100%; height: 36px;
+    border: 0; border-radius: 10px; background: none; color: var(--gold); cursor: pointer;
+    transition: background .2s ease, transform .15s ease;
+  }
+  .step:hover { background: rgba(217, 184, 115, .15); }
+  .step:active { transform: scale(.9); }
+  .window {
+    height: 56px; overflow: hidden; display: grid; place-items: center;
+    cursor: ns-resize; touch-action: none; user-select: none; -webkit-user-select: none;
+  }
+  .val { font: 700 clamp(23px, calc(5.6vw + 2px), 30px)/1 var(--serif); color: var(--ivory); transition: color .3s ease; }
+  .dial.set .val { color: var(--gold); }
+  .val.up { animation: rollUp .22s var(--ease); }
+  .val.down { animation: rollDown .22s var(--ease); }
+  @keyframes rollUp { from { transform: translateY(70%); opacity: 0; } to { transform: none; opacity: 1; } }
+  @keyframes rollDown { from { transform: translateY(-70%); opacity: 0; } to { transform: none; opacity: 1; } }
+  .how { margin-top: 12px; font-size: 17px; color: rgba(248, 241, 228, .65); }
+
+  .actions { margin-top: 18px; }
+  .go {
+    padding: 14px 44px; border: 0; border-radius: 12px;
+    background: linear-gradient(180deg, #e6c98a, var(--gold-deep)); color: var(--ink);
+    font: 700 22px var(--sans); letter-spacing: .03em; cursor: pointer;
+    box-shadow: 0 8px 20px rgba(0, 0, 0, .3);
+    transition: transform .28s var(--ease), filter .2s ease;
+    touch-action: manipulation;
+  }
+  .go:focus-visible { outline: 3px solid var(--gold); outline-offset: 3px; }
+  .go.dodging { transition: transform .22s cubic-bezier(.3, 1.6, .5, 1), filter .2s ease; }
+  .go:hover { filter: brightness(1.08); }
+  .go.ready { animation: pulse 1.5s ease-in-out infinite; }
+  @keyframes pulse { 50% { box-shadow: 0 0 0 9px rgba(217, 184, 115, .2), 0 8px 24px rgba(0, 0, 0, .3); } }
+  .msg { min-height: 1.6em; margin-top: 12px; font-size: 20px; color: var(--rose); }
+
+  #confetti { position: fixed; inset: 0; width: 100%; height: 100%; pointer-events: none; z-index: 5; }
+
+  @media (max-height: 700px) {
+    .lock-wrap { width: 84px; height: 98px; }
+    .hint-card { margin: 12px auto; }
+    .how { display: none; }
+  }
+
+  /* Music on/off, shown after the gate opens */
+  .music {
+    position: fixed; right: clamp(16px, 3vw, 32px); bottom: clamp(16px, 3vw, 32px); z-index: 10;
+    width: 46px; height: 46px; display: grid; place-items: center;
+    border-radius: 50%; border: 1px solid rgba(217, 184, 115, .6);
+    background: rgba(35, 12, 24, .6); color: var(--gold);
+    backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px);
+    cursor: pointer; transition: background .2s ease, opacity .3s ease;
+    opacity: .75;
+  }
+  .music:hover, .music:focus-visible { opacity: 1; background: rgba(35, 12, 24, .85); }
+  .music:focus-visible { outline: 3px solid var(--gold); outline-offset: 3px; }
+  .music[hidden] { display: none; }
+  .music .off { display: none; }
+  .music.muted .on { display: none; }
+  .music.muted .off { display: block; }
+
+
   @media (prefers-reduced-motion: reduce) {
     .stage.on .card > *,
     .stage.on .card > :nth-child(2) { animation: none; }
     .stage, video { transition-duration: .01s; }
+    .lock-wrap:not(.open):not(.shake) .lock,
+    .lock-wrap.shake, .lock-wrap.open .spark, .lock-wrap.open .plate { animation: none; }
+    .lock .shackle { transition-duration: .01s; }
+    .val.up, .val.down, .go.ready { animation: none; }
+    .stage.on .welcome-card > *, .stage.on .welcome-card > .giftbox, .giftbox.shake .gift-svg, .giftbox.open .spark { animation: none; }
+    .gb-lid, .gb-bow, .glow { transition-duration: .01s; }
+    .bubble, .invite, .invite.ready, .typing i, .invite .art svg, .invite .tw, .composer .type.live::after, .notif, .ls-hint { animation: none; }
+    .kbd-wrap { transition-duration: .01s; }
+    .ls-hint { opacity: .9; }
+    #launch.go { transition-duration: .01s; }
   }
 </style>
 </head>
 <body>
+
+<audio id="music" src="birthday-song.mp3" loop preload="auto"></audio>
+
+<section class="stage" id="lock">
+  <div class="lockscreen">
+    <svg class="ls-icon" viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="5" y="11" width="14" height="9" rx="2.5"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg>
+    <div class="ls-time" id="lsTime"></div>
+    <div class="ls-date" id="lsDate"></div>
+    <button type="button" class="notif" id="notif" hidden aria-label="Open the new message from The Alvarez Family">
+      <span class="avatar" aria-hidden="true">AF</span>
+      <span class="ntext"><strong>The Alvarez Family</strong><span>Sent you a message</span></span>
+      <em>now</em>
+    </button>
+    <p class="ls-hint" id="lsHint" hidden>Tap the message to open it</p>
+  </div>
+</section>
+
+<section class="stage" id="chat">
+  <div class="phone" role="group" aria-label="Message conversation with The Alvarez Family">
+    <header class="chat-head">
+      <svg class="ico" viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 5l-7 7 7 7"/></svg>
+      <div class="avatar" aria-hidden="true">AF</div>
+      <div class="who"><strong>The Alvarez Family</strong><span>Active now</span></div>
+      <svg class="ico" viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 4h4l2 5-2.5 1.5a11 11 0 0 0 5 5L15 13l5 2v4a2 2 0 0 1-2 2A15 15 0 0 1 3 6a2 2 0 0 1 2-2z"/></svg>
+      <svg class="ico" viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="6" width="12" height="12" rx="2.5"/><path d="M15 10.5l6-3.5v10l-6-3.5"/></svg>
+    </header>
+    <div class="chat-msgs" id="chatMsgs" aria-live="polite"><div class="day">Today</div></div>
+    <div class="composer" aria-hidden="true">
+      <span class="plus">+</span><span class="type" id="composerType">Message</span>
+      <svg viewBox="0 0 24 24" width="22" height="22" fill="currentColor"><path d="M3 20l18-8L3 4v6l11 2-11 2z"/></svg>
+    </div>
+    <div class="kbd-wrap" id="kbdWrap" aria-hidden="true"><div class="kbd" id="kbd"></div></div>
+  </div>
+</section>
+
+<div class="finger" id="finger" aria-hidden="true"></div>
+<div class="ripple" id="ripple" aria-hidden="true"></div>
+<div id="launch" aria-hidden="true"></div>
+
+<section class="stage" id="welcome">
+  <div class="welcome-card">
+    <div class="giftbox" id="giftbox" aria-hidden="true">
+      <div class="glow"></div>
+      <svg class="gift-svg" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+        <defs><linearGradient id="gGold" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#ecd29a"/><stop offset="1" stop-color="#b48f4b"/></linearGradient></defs>
+        <rect x="42" y="100" width="116" height="84" rx="8" fill="url(#gGold)"/>
+        <rect x="92" y="100" width="16" height="84" fill="#3a1428" opacity=".85"/>
+        <g class="gb-lid">
+          <rect x="30" y="70" width="140" height="36" rx="8" fill="url(#gGold)"/>
+          <rect x="92" y="70" width="16" height="36" fill="#3a1428" opacity=".85"/>
+          <g class="gb-bow">
+            <path d="M100 70 C70 18 26 38 76 70 Z" fill="url(#gGold)" stroke="#3a1428" stroke-width="3" stroke-linejoin="round"/>
+            <path d="M100 70 C130 18 174 38 124 70 Z" fill="url(#gGold)" stroke="#3a1428" stroke-width="3" stroke-linejoin="round"/>
+            <circle cx="100" cy="68" r="9" fill="url(#gGold)" stroke="#3a1428" stroke-width="3"/>
+          </g>
+        </g>
+      </svg>
+      <span class="spark" style="--dx:-110px;--dy:-70px"></span>
+      <span class="spark" style="--dx:110px;--dy:-70px"></span>
+      <span class="spark" style="--dx:-130px;--dy:10px"></span>
+      <span class="spark" style="--dx:130px;--dy:10px"></span>
+      <span class="spark" style="--dx:-60px;--dy:-120px"></span>
+      <span class="spark" style="--dx:60px;--dy:-120px"></span>
+      <span class="spark" style="--dx:0;--dy:-140px"></span>
+      <span class="spark" style="--dx:-90px;--dy:-100px"></span>
+      <span class="spark" style="--dx:90px;--dy:-100px"></span>
+    </div>
+    <h2 class="welcome-title" id="wTitle">Your surprise has arrived</h2>
+    <p class="welcome-sub" id="wSub">Let us unwrap it for you.</p>
+  </div>
+</section>
+
+<section class="stage" id="gate">
+  <div class="gate-card">
+    <div class="lock-wrap" id="lockWrap" aria-hidden="true">
+      <svg class="lock" viewBox="0 0 120 140" xmlns="http://www.w3.org/2000/svg">
+        <defs><linearGradient id="goldGrad" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#ecd29a"/><stop offset="1" stop-color="#b48f4b"/></linearGradient></defs>
+        <path class="shackle" d="M30 66 V44 a30 30 0 0 1 60 0 V66"/>
+        <rect class="body-rect" x="14" y="62" width="92" height="70" rx="14"/>
+        <circle class="plate" cx="60" cy="94" r="14"/>
+        <path class="keyhole" d="M56 90 h8 l-1.5 16 h-5 z"/>
+      </svg>
+      <span class="spark" style="--dx:-70px;--dy:-60px"></span>
+      <span class="spark" style="--dx:70px;--dy:-60px"></span>
+      <span class="spark" style="--dx:-90px;--dy:10px"></span>
+      <span class="spark" style="--dx:90px;--dy:10px"></span>
+      <span class="spark" style="--dx:-40px;--dy:-95px"></span>
+      <span class="spark" style="--dx:40px;--dy:-95px"></span>
+      <span class="spark" style="--dx:-55px;--dy:55px"></span>
+      <span class="spark" style="--dx:55px;--dy:55px"></span>
+    </div>
+
+    <h2 class="gate-title">Only you can open this</h2>
+    <p class="gate-sub">Set the dials to a very special date.</p>
+
+    <div class="hint-card">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3.2c-.9 1.1-.9 2 0 2.8.9-.8.9-1.7 0-2.8z"/><path d="M12 7v3.2"/><rect x="5" y="10.2" width="14" height="5.6" rx="1.6"/><path d="M4 21h16"/><path d="M6 15.8V21M18 15.8V21"/><path d="M5.2 13.2c1.2 1.1 2.1 1.1 3.3 0s2.1-1.1 3.3 0 2.1 1.1 3.3 0 2.1-1.1 3.3 0"/></svg>
+      <div><small>A little hint</small><strong>The password is <em>the day you were born</em>.</strong></div>
+    </div>
+
+    <div class="dials" id="dials">
+      <div class="dial" data-kind="month" tabindex="0" role="spinbutton" aria-label="Month">
+        <span class="cap" aria-hidden="true">Month</span>
+        <button type="button" class="step up" tabindex="-1" aria-label="Next month"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 15l6-6 6 6"/></svg></button>
+        <div class="window"><span class="val"></span></div>
+        <button type="button" class="step down" tabindex="-1" aria-label="Previous month"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg></button>
+      </div>
+      <div class="dial" data-kind="day" tabindex="0" role="spinbutton" aria-label="Day">
+        <span class="cap" aria-hidden="true">Day</span>
+        <button type="button" class="step up" tabindex="-1" aria-label="Next day"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 15l6-6 6 6"/></svg></button>
+        <div class="window"><span class="val"></span></div>
+        <button type="button" class="step down" tabindex="-1" aria-label="Previous day"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg></button>
+      </div>
+      <div class="dial" data-kind="year" tabindex="0" role="spinbutton" aria-label="Year">
+        <span class="cap" aria-hidden="true">Year</span>
+        <button type="button" class="step up" tabindex="-1" aria-label="Next year"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 15l6-6 6 6"/></svg></button>
+        <div class="window"><span class="val"></span></div>
+        <button type="button" class="step down" tabindex="-1" aria-label="Previous year"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg></button>
+      </div>
+    </div>
+    <p class="how">Tap the arrows, swipe, or scroll each dial.</p>
+
+    <div class="actions"><button type="button" class="go" id="go">Open</button></div>
+    <p class="msg" id="msg" role="status" aria-live="polite"></p>
+  </div>
+</section>
+
+<canvas id="confetti" aria-hidden="true"></canvas>
 
 <section class="stage" id="intro">
   <div class="card">
@@ -128,6 +662,11 @@
   </div>
 </section>
 
+<button type="button" class="music" id="musicBtn" aria-label="Mute music" aria-pressed="false" hidden>
+  <svg class="on" viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 18V5l11-2v13"/><circle cx="6.5" cy="18" r="2.5"/><circle cx="17.5" cy="16" r="2.5"/></svg>
+  <svg class="off" viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 18V5l11-2v13"/><circle cx="6.5" cy="18" r="2.5"/><circle cx="17.5" cy="16" r="2.5"/><path d="M3 3l18 18"/></svg>
+</button>
+
 <script>
   // Curated order: elders first, then relatives, a long heartfelt message in
   // the middle, and the grandchildren as the grand finale.
@@ -136,6 +675,7 @@
     'video16.mp4', // elder couple
     'video14.mp4', // uncle, cheerful greeting
     'video12.mp4', // short, sincere message
+    'video20.mp4', // new clip, plays right before the longest message
     'video19.mp4', // longest, heartfelt message
     'video15.mp4', // couple on the sofa
     'video18.mp4', // couple in the car
@@ -143,7 +683,7 @@
     'video11.mp4'  // the kids, grand finale
   ];
 
-  const INTRO_MS = 7000;
+  const INTRO_MS = 6000;
   const $ = id => document.getElementById(id);
   const show = id => document.querySelectorAll('.stage').forEach(s => s.classList.toggle('on', s.id === id));
   const wait = ms => new Promise(r => setTimeout(r, ms));
@@ -160,8 +700,9 @@
 
   async function playCurrent() {
     video.classList.add('fade');
-    await wait(400);
+    await wait(250);
     video.src = videoList[index];
+    setVideoGain();
     video.load();
     video.classList.remove('fade');
     await start();
@@ -170,8 +711,90 @@
   async function next() {
     index++;
     if (index < videoList.length) return playCurrent();
+    setMusic(LEVEL.full, 2.5);
     show('outro');
   }
+
+  // ---------- Background music ----------
+  // Plays from the moment the gate opens and never stops: full volume for the
+  // intro and closing, softly under the video messages, and a small swell in
+  // the brief moments between clips so there is never silence.
+  const music = $('music'), musicBtn = $('musicBtn');
+  const LEVEL = { full: 0.55, gap: 0.3, duck: 0.1 };
+  // Video loudness: browsers cap a video's own volume at 100%, so a Web Audio
+  // booster (with a limiter to prevent distortion) lifts every clip above that.
+  // VIDEO_BOOST is the overall level (1 = original, 2.5 = about +8 dB).
+  // CLIP_GAIN fine-tunes a single clip: raise a quiet one, lower a loud one.
+  const VIDEO_BOOST = 2.5;
+  const CLIP_GAIN = {
+    'video17.mp4': 1, 'video16.mp4': 1, 'video14.mp4': 1, 'video12.mp4': 1, 'video20.mp4': 1, 'video19.mp4': 1,
+    'video15.mp4': 1, 'video18.mp4': 1, 'video13.mp4': 1, 'video11.mp4': 1
+  };
+  let videoGain = null;
+  const setVideoGain = () => {
+    if (videoGain) videoGain.gain.value = VIDEO_BOOST * (CLIP_GAIN[videoList[index]] || 1);
+  };
+
+  let ctx = null, gain = null, musicOn = true, musicOk = true, level = 0, fadeTimer = null;
+
+  function applyLevel(sec) {
+    const target = musicOn ? level : 0;
+    if (gain) { // Web Audio: smooth on every device, including iPhones
+      const g = gain.gain, t = ctx.currentTime;
+      g.cancelScheduledValues(t); g.setValueAtTime(g.value, t);
+      g.linearRampToValueAtTime(target, t + Math.max(sec, 0.01));
+    } else { // plain volume fade fallback
+      clearInterval(fadeTimer);
+      const from = music.volume, steps = Math.max(1, Math.round(sec * 30)); let i = 0;
+      fadeTimer = setInterval(() => {
+        i++; music.volume = Math.min(1, Math.max(0, from + (target - from) * i / steps));
+        if (i >= steps) clearInterval(fadeTimer);
+      }, 33);
+    }
+  }
+  function setMusic(l, sec) { level = l; if (musicOk) applyLevel(sec); }
+
+  function startMusic() {
+    const AC = window.AudioContext || window.webkitAudioContext;
+    if (AC && location.protocol !== 'file:' && !ctx) {
+      try {
+        ctx = new AC(); gain = ctx.createGain(); gain.gain.value = 0;
+        ctx.createMediaElementSource(music).connect(gain).connect(ctx.destination);
+      } catch { ctx = gain = null; }
+      try {
+        // Video chain: boost, then a limiter so loud moments never distort
+        videoGain = ctx.createGain();
+        const limiter = ctx.createDynamicsCompressor();
+        limiter.threshold.value = -8; limiter.knee.value = 6; limiter.ratio.value = 14;
+        limiter.attack.value = 0.003; limiter.release.value = 0.2;
+        ctx.createMediaElementSource(video).connect(videoGain).connect(limiter).connect(ctx.destination);
+        setVideoGain();
+      } catch { videoGain = null; }
+    }
+    if (ctx && ctx.state === 'suspended') ctx.resume();
+    if (!gain) music.volume = 0;
+    music.play().then(() => { musicBtn.hidden = false; setMusic(LEVEL.full, 2.5); })
+                .catch(() => { musicOk = false; });
+  }
+
+  music.addEventListener('error', () => { musicOk = false; musicBtn.hidden = true; }); // no song file? carry on silently
+  musicBtn.addEventListener('click', () => {
+    musicOn = !musicOn;
+    musicBtn.classList.toggle('muted', !musicOn);
+    musicBtn.setAttribute('aria-pressed', String(!musicOn));
+    musicBtn.setAttribute('aria-label', musicOn ? 'Mute music' : 'Play music');
+    applyLevel(0.3);
+  });
+
+  // Warm up the next clip so it starts the instant the current one ends
+  const preloader = document.createElement('video');
+  preloader.preload = 'auto'; preloader.muted = true;
+  const warmNext = () => { if (index + 1 < videoList.length) preloader.src = videoList[index + 1]; };
+
+  video.addEventListener('playing', () => { setMusic(LEVEL.duck, 0.8); warmNext(); });
+  const betweenClips = () => setMusic(LEVEL.gap, 0.4);
+  video.addEventListener('ended', betweenClips);
+  video.addEventListener('error', betweenClips);
 
   video.addEventListener('ended', next);
   video.addEventListener('error', next); // never stall on a missing file
@@ -181,13 +804,505 @@
     window.addEventListener(ev, () => { video.muted = false; }, { once: true })
   );
 
-  (async function run() {
+  // ---------- Password gate: date dials ----------
+  // Turn each dial to the password date. A dial glows gold when it is right,
+  // and the Open button dodges until all three match.
+  const MONTHS = ['January', 'February', 'March', 'April', 'May', 'June', 'July',
+                  'August', 'September', 'October', 'November', 'December'];
+  const DAYS = Array.from({ length: 31 }, (_, k) => String(k + 1));
+  const YEARS = Array.from({ length: 26 }, (_, k) => String(1950 + k)); // 1950 to 1975
+  const dialData = {
+    month: { vals: MONTHS, i: 0,  target: MONTHS.indexOf('November') },
+    day:   { vals: DAYS,   i: 0,  target: DAYS.indexOf('8') },
+    year:  { vals: YEARS,  i: YEARS.indexOf('1958'), target: YEARS.indexOf('1961') }
+  };
+
+  const lockWrap = $('lockWrap'), msg = $('msg'), goBtn = $('go'), dialsEl = $('dials');
+  let unlocked = false;
+
+  // Tiny sound effects (only after the person has tapped something)
+  let sfx = null;
+  function blip(freq, dur, vol, delay = 0) {
+    try {
+      const AC = window.AudioContext || window.webkitAudioContext;
+      sfx = sfx || new AC();
+      if (sfx.state === 'suspended') sfx.resume();
+      const t = sfx.currentTime + delay, o = sfx.createOscillator(), g = sfx.createGain();
+      o.type = 'sine'; o.frequency.value = freq;
+      g.gain.setValueAtTime(0.0001, t);
+      g.gain.exponentialRampToValueAtTime(vol, t + 0.006);
+      g.gain.exponentialRampToValueAtTime(0.0001, t + dur);
+      o.connect(g).connect(sfx.destination);
+      o.start(t); o.stop(t + dur + 0.03);
+    } catch { /* sound is optional */ }
+  }
+  const tick = () => blip(1500, 0.04, 0.035);
+  const lockedIn = () => blip(880, 0.16, 0.06);
+  const chime = () => [784, 988, 1175, 1568].forEach((f, k) => blip(f, 0.5, 0.06, k * 0.11));
+
+  const dialEl = k => dialsEl.querySelector(`[data-kind="${k}"]`);
+  const dialOk = k => dialData[k].i === dialData[k].target;
+  const allOk = () => Object.keys(dialData).every(dialOk);
+
+  function render(k, dir) {
+    const d = dialData[k], el = dialEl(k), val = el.querySelector('.val');
+    val.textContent = d.vals[d.i];
+    val.classList.remove('up', 'down');
+    if (dir) { void val.offsetWidth; val.classList.add(dir > 0 ? 'up' : 'down'); }
+    el.setAttribute('aria-valuetext', d.vals[d.i]);
+    const was = el.classList.contains('set'), now = dialOk(k);
+    el.classList.toggle('set', now);
+    if (dir && now && !was) lockedIn();
+  }
+
+  function step(k, dir) {
+    if (unlocked) return;
+    const d = dialData[k];
+    d.i = (d.i + dir + d.vals.length) % d.vals.length;
+    render(k, dir);
+    if (!dialOk(k) || !allOk()) tick();
+    const ready = allOk();
+    goBtn.classList.toggle('ready', ready);
+    if (ready) { homeAgain(); msg.textContent = 'That is the one! Tap Open.'; msg.style.color = 'var(--gold)'; }
+    else { msg.textContent = ''; msg.style.color = ''; }
+  }
+
+  Object.keys(dialData).forEach(k => {
+    const el = dialEl(k), win = el.querySelector('.window');
+    render(k, 0);
+    el.querySelector('.up').addEventListener('click', () => step(k, 1));
+    el.querySelector('.down').addEventListener('click', () => step(k, -1));
+    // Mouse wheel
+    let wheelAt = 0;
+    el.addEventListener('wheel', e => {
+      e.preventDefault();
+      if (Date.now() - wheelAt < 110) return;
+      wheelAt = Date.now(); step(k, e.deltaY > 0 ? 1 : -1);
+    }, { passive: false });
+    // Swipe or drag: dragging up rolls the dial forward, like a real combination lock
+    let lastY = 0, acc = 0, dragged = false, down = false;
+    win.addEventListener('pointerdown', e => { down = true; dragged = false; lastY = e.clientY; acc = 0; win.setPointerCapture(e.pointerId); });
+    win.addEventListener('pointermove', e => {
+      if (!down) return;
+      acc += e.clientY - lastY; lastY = e.clientY;
+      while (acc <= -26) { step(k, 1); acc += 26; dragged = true; }
+      while (acc >= 26)  { step(k, -1); acc -= 26; dragged = true; }
+    });
+    const end = () => { if (down && !dragged) step(k, 1); down = false; };
+    win.addEventListener('pointerup', end);
+    win.addEventListener('pointercancel', () => { down = false; });
+    // Keyboard
+    el.addEventListener('keydown', e => {
+      if (e.key === 'ArrowUp') { e.preventDefault(); step(k, 1); }
+      else if (e.key === 'ArrowDown') { e.preventDefault(); step(k, -1); }
+      else if (e.key === 'Enter') submit();
+    });
+  });
+
+  // The Open button runs away from wrong dates and stays put for the right one.
+  let curX = 0, curY = 0;
+  function moveGo(x, y) {
+    curX = x; curY = y;
+    goBtn.style.transform = `translate(${x}px, ${y}px)`;
+  }
+  function dodge() {
+    goBtn.classList.add('dodging');
+    const r = goBtn.getBoundingClientRect(), m = 12, pad = 10;
+    const vw = window.innerWidth, vh = window.innerHeight;
+    // Never run on top of the dials or the text, so the page stays usable
+    const avoid = [...document.querySelectorAll('#gate .lock-wrap, #gate .gate-title, #gate .gate-sub, #gate .hint-card, #gate .dials, #gate .how, #gate .msg')]
+      .map(e => e.getBoundingClientRect());
+    const free = (l, t) => l > m && t > m && l + r.width < vw - m && t + r.height < vh - m &&
+      !avoid.some(a => l + r.width > a.left - pad && l < a.right + pad && t + r.height > a.top - pad && t < a.bottom + pad);
+    for (const minDist of [90, 45]) {
+      for (let i = 0; i < 60; i++) {
+        const dx = (Math.random() * 2 - 1) * 230, dy = (Math.random() * 2 - 1) * 230;
+        if (Math.hypot(dx, dy) >= minDist && free(r.left + dx, r.top + dy)) return moveGo(curX + dx, curY + dy);
+      }
+    }
+    // Tight screen: do a little side-step instead
+    const side = (Math.random() < .5 ? -1 : 1) * 60;
+    if (free(r.left + side, r.top)) return moveGo(curX + side, curY);
+    moveGo(0, 0);
+  }
+  function homeAgain() {
+    goBtn.classList.remove('dodging');
+    if (curX || curY) moveGo(0, 0);
+  }
+
+  function wrong() {
+    msg.style.color = '';
+    msg.textContent = 'Not quite. Think of the day you were born.';
+    lockWrap.classList.remove('shake');
+    void lockWrap.offsetWidth; // restart the animation
+    lockWrap.classList.add('shake');
+  }
+  lockWrap.addEventListener('animationend', e => {
+    if (e.animationName === 'shake') lockWrap.classList.remove('shake');
+  });
+
+  // Gold confetti burst from the lock
+  function confetti() {
+    if (matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+    const cv = $('confetti'), c = cv.getContext('2d'), dpr = window.devicePixelRatio || 1;
+    const W = window.innerWidth, H = window.innerHeight;
+    cv.width = W * dpr; cv.height = H * dpr; c.setTransform(dpr, 0, 0, dpr, 0, 0);
+    const colors = ['#d9b873', '#ecd29a', '#f8f1e4', '#f2a79f', '#b48f4b'];
+    const r = lockWrap.getBoundingClientRect(), ox = r.left + r.width / 2, oy = r.top + r.height * 0.55;
+    const ps = Array.from({ length: 120 }, () => ({
+      x: ox, y: oy, vx: (Math.random() - .5) * 15, vy: -Math.random() * 13 - 4,
+      w: 6 + Math.random() * 6, h: 3 + Math.random() * 5,
+      rot: Math.random() * 6.28, vr: (Math.random() - .5) * .4,
+      color: colors[Math.floor(Math.random() * colors.length)], life: 0
+    }));
+    let last = performance.now();
+    (function frame(now) {
+      const dt = Math.min(2, (now - last) / 16.7); last = now;
+      c.clearRect(0, 0, W, H);
+      let alive = false;
+      for (const p of ps) {
+        p.vy += 0.32 * dt; p.vx *= 0.992; p.x += p.vx * dt; p.y += p.vy * dt;
+        p.rot += p.vr * dt; p.life += dt;
+        if (p.y < H + 20 && p.life < 160) {
+          alive = true;
+          c.save(); c.globalAlpha = Math.max(0, 1 - p.life / 160);
+          c.translate(p.x, p.y); c.rotate(p.rot); c.fillStyle = p.color;
+          c.fillRect(-p.w / 2, -p.h / 2, p.w, p.h); c.restore();
+        }
+      }
+      if (alive) requestAnimationFrame(frame); else c.clearRect(0, 0, W, H);
+    })(last);
+  }
+
+  async function submit() {
+    if (unlocked) return;
+    if (!allOk()) { wrong(); dodge(); return; }
+    unlocked = true;
+    homeAgain();
+    goBtn.classList.remove('ready');
+    msg.textContent = '';
+    lockWrap.classList.add('open');
+    startMusic(); // the tap counts as a user gesture, so sound is allowed
+    chime();
+    confetti();
+    await wait(1900);
     show('intro');
     await wait(INTRO_MS);
     show('player');
-    await wait(1400);
+    await wait(600); // the first clip starts as the screen fades in, with music covering the change
     playCurrent();
-  })();
+  }
+
+  goBtn.addEventListener('click', submit);
+  // Hover (mouse), touch, and keyboard all trigger the dodge on a wrong date.
+  goBtn.addEventListener('pointerenter', e => { if (e.pointerType === 'mouse' && !unlocked && !allOk()) { wrong(); dodge(); } });
+  goBtn.addEventListener('pointerdown', e => { if (!unlocked && !allOk()) { e.preventDefault(); wrong(); dodge(); } });
+
+  // ---------- Unwrapping: the gift opens by itself ----------
+  // No question to answer: she already chose to open it by tapping the attachment.
+  const giftbox = $('giftbox'), wTitle = $('wTitle'), wSub = $('wSub');
+  let unwrapDone = false;
+  const toGate = () => { if (!unwrapDone) { unwrapDone = true; show('gate'); } };
+
+  async function swapText(title, sub) {
+    wTitle.style.opacity = wSub.style.opacity = 0;
+    await wait(260);
+    wTitle.textContent = title; wSub.textContent = sub;
+    wTitle.style.opacity = wSub.style.opacity = 1;
+  }
+
+  async function runUnwrap() {
+    $('welcome').addEventListener('click', toGate, { once: true }); // tap anywhere to skip ahead
+    await wait(1800);                      // gift pops in, text fades up
+    if (unwrapDone) return;
+    giftbox.classList.add('shake');        // it shakes, then...
+    await wait(1450);
+    if (unwrapDone) return;
+    giftbox.classList.remove('shake');
+    giftbox.classList.add('open');         // ...the lid and bow pop off
+    await wait(900);
+    if (unwrapDone) return;
+    await swapText('It is ready for you', 'One last step: enter the password.');
+    await wait(2400);
+    toGate();
+  }
+
+  // ---------- Opening: a private message with the invitation ----------
+  // The conversation plays by itself: your POV receives a message, sees the
+  // invitation attachment, taps it, and the greeting website launches.
+  const msgs = $('chatMsgs'), finger = $('finger'), ripple = $('ripple'), launchEl = $('launch');
+  let invite = null, launched = false;
+  const CHAT_START_DELAY = 4300; // 3 seconds of quiet, plus the 1.3 second fade-in, before the first message
+  const STOP = {};
+  const beat = async ms => { await wait(ms); if (launched) throw STOP; };
+  const toBottom = () => { msgs.scrollTop = msgs.scrollHeight; };
+
+  function bubble(cls, text) {
+    const d = document.createElement('div');
+    d.className = 'bubble ' + cls; d.textContent = text;
+    msgs.appendChild(d); toBottom(); return d;
+  }
+  function typing(on) {
+    const old = msgs.querySelector('.typing');
+    if (old) old.remove();
+    if (on) {
+      const d = document.createElement('div');
+      d.className = 'bubble in typing'; d.setAttribute('aria-label', 'typing');
+      d.innerHTML = '<i></i><i></i><i></i>';
+      msgs.appendChild(d); toBottom();
+    }
+  }
+  function addInvite() {
+    invite = document.createElement('button');
+    invite.type = 'button'; invite.className = 'invite';
+    invite.setAttribute('aria-label', 'Open the surprise from The Alvarez Family');
+    invite.innerHTML = `
+      <span class="art"><svg viewBox="0 0 120 120" aria-hidden="true">
+        <defs><linearGradient id="goldGrad3" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#ecd29a"/><stop offset="1" stop-color="#b48f4b"/></linearGradient></defs>
+        <rect x="24" y="58" width="72" height="50" rx="6" fill="url(#goldGrad3)"/>
+        <rect x="16" y="38" width="88" height="24" rx="6" fill="url(#goldGrad3)"/>
+        <rect x="54" y="38" width="12" height="70" fill="#3a1428" opacity=".85"/>
+        <path d="M60 38 C44 8 18 18 38 38 Z" fill="none" stroke="#f8f1e4" stroke-width="4" stroke-linejoin="round"/>
+        <path d="M60 38 C76 8 102 18 82 38 Z" fill="none" stroke="#f8f1e4" stroke-width="4" stroke-linejoin="round"/>
+        <path class="tw" d="M16 22l2.2 5.8L24 30l-5.8 2.2L16 38l-2.2-5.8L8 30l5.8-2.2z" fill="#ecd29a"/>
+        <path class="tw t2" d="M104 14l2.6 6.4L113 23l-6.4 2.6L104 32l-2.6-6.4L95 23l6.4-2.6z" fill="#f8f1e4"/>
+        <path class="tw t3" d="M106 70l1.8 4.6 4.6 1.8-4.6 1.8-1.8 4.6-1.8-4.6-4.6-1.8 4.6-1.8z" fill="#ecd29a"/>
+      </svg></span>
+      <span class="meta"><strong>A surprise is waiting</strong><span>Tap to see what is inside</span></span>
+      <span class="cta">Tap to open <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 6l6 6-6 6"/></svg></span>`;
+    invite.addEventListener('click', launch); // a real tap works at any time
+    msgs.appendChild(invite); toBottom();
+    setTimeout(() => invite && invite.classList.add('ready'), 500);
+  }
+
+  // ----- Chat sounds (made in the browser, no audio files needed) -----
+  // Browsers only allow sound after the person has tapped something. The lock
+  // screen below turns that one tap into part of the story: tapping the
+  // notification opens the chat, and every chime and key click then plays.
+  const soundOn = () => sfx && sfx.state === 'running';
+  function ensureSfx() {
+    const AC = window.AudioContext || window.webkitAudioContext;
+    if (!AC) return null;
+    try { sfx = sfx || new AC(); } catch { return null; }
+    return sfx;
+  }
+  function prepareSound() {
+    if (!ensureSfx()) return;
+    sfx.resume().catch(() => {});
+    const enable = () => { if (sfx) sfx.resume().catch(() => {}); };
+    ['pointerdown', 'keydown', 'touchstart'].forEach(ev => window.addEventListener(ev, enable, { passive: true }));
+  }
+
+  // Notification: a soft two-note chime
+  function ding() {
+    if (!soundOn()) return;
+    const t = sfx.currentTime;
+    [[880, 0], [1318.5, 0.11]].forEach(([f, d]) => {
+      const o = sfx.createOscillator(), g = sfx.createGain();
+      o.type = 'sine'; o.frequency.value = f;
+      g.gain.setValueAtTime(0.0001, t + d);
+      g.gain.exponentialRampToValueAtTime(0.14, t + d + 0.012);
+      g.gain.exponentialRampToValueAtTime(0.0001, t + d + 0.5);
+      o.connect(g).connect(sfx.destination);
+      o.start(t + d); o.stop(t + d + 0.55);
+    });
+  }
+  // Typing: a short soft key click, slightly different each time
+  let noise = null;
+  function keyClick(space) {
+    if (!soundOn()) return;
+    if (!noise) {
+      noise = sfx.createBuffer(1, Math.floor(sfx.sampleRate * 0.05), sfx.sampleRate);
+      const d = noise.getChannelData(0);
+      for (let i = 0; i < d.length; i++) d[i] = Math.random() * 2 - 1;
+    }
+    const t = sfx.currentTime, src = sfx.createBufferSource(), f = sfx.createBiquadFilter(), g = sfx.createGain();
+    src.buffer = noise;
+    f.type = 'bandpass'; f.Q.value = 1.3; f.frequency.value = space ? 900 : 2000 + Math.random() * 900;
+    g.gain.setValueAtTime(0.0001, t);
+    g.gain.exponentialRampToValueAtTime(space ? 0.16 : 0.12, t + 0.003);
+    g.gain.exponentialRampToValueAtTime(0.0001, t + 0.045);
+    src.connect(f).connect(g).connect(sfx.destination);
+    src.start(t); src.stop(t + 0.05);
+  }
+  // Send: a quick soft rising blip
+  function sendBlip() {
+    if (!soundOn()) return;
+    const t = sfx.currentTime, o = sfx.createOscillator(), g = sfx.createGain();
+    o.type = 'sine'; o.frequency.setValueAtTime(620, t); o.frequency.exponentialRampToValueAtTime(980, t + 0.1);
+    g.gain.setValueAtTime(0.0001, t);
+    g.gain.exponentialRampToValueAtTime(0.1, t + 0.01);
+    g.gain.exponentialRampToValueAtTime(0.0001, t + 0.16);
+    o.connect(g).connect(sfx.destination);
+    o.start(t); o.stop(t + 0.2);
+  }
+
+  // ----- On-screen keyboard -----
+  const kbdWrap = $('kbdWrap'), kbd = $('kbd');
+  const LAYERS = {
+    abc: [['q','w','e','r','t','y','u','i','o','p'], ['a','s','d','f','g','h','j','k','l'],
+          ['SHIFT','z','x','c','v','b','n','m','BKSP'], ['SYM',',','SPACE','.','SEND']],
+    sym: [['1','2','3','4','5','6','7','8','9','0'], ['-','/',':',';','(',')','$','&','@'],
+          ['EXTRA','.',',','?','!',"'",'BKSP'], ['ABC','SPACE','SEND']]
+  };
+  const FN = { SHIFT: '⇧', BKSP: '⌫', SYM: '?123', ABC: 'ABC', EXTRA: '#+=', SPACE: 'space', SEND: 'Send' };
+  let layer = 'abc', keyEls = {};
+
+  function buildKeys() {
+    kbd.innerHTML = ''; keyEls = {};
+    LAYERS[layer].forEach((row, r) => {
+      const rowEl = document.createElement('div');
+      rowEl.className = 'krow' + (layer === 'abc' && r === 1 ? ' indent' : '');
+      row.forEach(k => {
+        const el = document.createElement('div');
+        const isFn = k in FN;
+        el.className = 'key' + (isFn ? ' fn' : ' alpha');
+        if (k === 'SHIFT' || k === 'BKSP' || k === 'EXTRA') el.classList.add('w15');
+        if (k === 'SYM' || k === 'ABC') el.classList.add('w2');
+        if (k === 'SPACE') el.classList.add('w5');
+        if (k === 'SEND') { el.classList.add('send', 'w2'); }
+        el.innerHTML = '<span class="lbl">' + (isFn ? FN[k] : k) + '</span>' + (isFn ? '' : '<span class="pop">' + k + '</span>');
+        rowEl.appendChild(el); keyEls[k] = el;
+      });
+      kbd.appendChild(rowEl);
+    });
+  }
+  const setLayer = name => { layer = name; buildKeys(); };
+  const setShift = on => { kbd.classList.toggle('shift', on); if (keyEls.SHIFT) keyEls.SHIFT.classList.toggle('on', on); };
+
+  async function press(k) {
+    const el = keyEls[k];
+    if (!el) return;
+    el.classList.add('down'); keyClick(k === 'SPACE');
+    await beat(95);
+    el.classList.remove('down');
+  }
+  function followScroll(ms) { // keep the newest message in view while the keyboard moves
+    const t0 = performance.now();
+    const id = setInterval(() => { toBottom(); if (performance.now() - t0 > ms) clearInterval(id); }, 30);
+  }
+  async function openKeyboard() {
+    setLayer('abc'); setShift(false);
+    kbdWrap.classList.add('show'); followScroll(700);
+    await beat(520);
+    kbdWrap.classList.add('open');
+  }
+  async function closeKeyboard() {
+    kbdWrap.classList.remove('open', 'show'); followScroll(700);
+    await beat(520);
+  }
+
+  // Her reply is typed on the keyboard, key by key, in sync with the text box and the key clicks
+  async function typeReply(text) {
+    const field = $('composerType');
+    await openKeyboard();
+    await beat(350);
+    field.classList.add('live'); field.textContent = '';
+    for (const ch of text) {
+      const upper = ch !== ch.toLowerCase();
+      const key = ch === ' ' ? 'SPACE' : ch.toLowerCase();
+      const need = (/[a-z,.]/.test(key) || key === 'SPACE') ? 'abc' : 'sym';
+      if (need !== layer && key !== 'SPACE') {          // switch between letters and symbols
+        await press(need === 'sym' ? 'SYM' : 'ABC');
+        setLayer(need); await beat(160);
+      }
+      if (upper) { await press('SHIFT'); setShift(true); await beat(140); }
+      await press(key);
+      field.textContent += ch;
+      if (upper) setShift(false);
+      await beat(/[,?.]/.test(ch) ? 230 : 55 + Math.random() * 90);
+    }
+    await beat(500);
+    await press('SEND');                                // send
+    sendBlip();
+    field.classList.remove('live'); field.textContent = 'Message';
+    bubble('out', text);
+    await beat(1000);
+    await closeKeyboard();
+  }
+
+  async function tapInvite() {
+    const r = invite.getBoundingClientRect();
+    const tx = r.left + r.width * 0.68, ty = r.top + r.height * 0.58;
+    const sx = Math.min(innerWidth - 30, r.right + 60), sy = Math.min(innerHeight - 30, r.bottom + 150);
+    finger.style.transition = 'none';
+    finger.style.left = sx + 'px'; finger.style.top = sy + 'px';
+    void finger.offsetWidth; finger.style.transition = '';
+    finger.classList.add('show');
+    finger.style.left = tx + 'px'; finger.style.top = ty + 'px';
+    await beat(1050);
+    finger.classList.add('tap'); invite.classList.add('pressed');
+    ripple.style.left = tx + 'px'; ripple.style.top = ty + 'px';
+    ripple.classList.remove('go'); void ripple.offsetWidth; ripple.classList.add('go');
+    await beat(380);
+  }
+
+  async function launch() {
+    if (launched) return;
+    launched = true;
+    finger.classList.remove('show');
+    const r = invite.getBoundingClientRect();
+    invite.classList.add('pressed');
+    launchEl.style.setProperty('--x', (r.left + r.width / 2) + 'px');
+    launchEl.style.setProperty('--y', (r.top + r.height / 2) + 'px');
+    launchEl.classList.add('go');          // the screen opens up from the attachment
+    await wait(900);
+    show('welcome');
+    runUnwrap();
+    await wait(500);
+    launchEl.classList.add('out');
+    await wait(1300);
+    launchEl.className = ''; launchEl.style.removeProperty('--x'); launchEl.style.removeProperty('--y');
+  }
+
+  async function runChat(startDelay) {
+    try {
+      await beat(startDelay);
+      ding(); bubble('in', 'Hi Cora!');
+      await beat(1100);
+      ding(); bubble('in', 'We have something special for you.');
+      await beat(1000);
+      typing(true);
+      await beat(1500);
+      typing(false);
+      ding(); addInvite();
+      await beat(1500);
+      await typeReply('Oh, what is this?');
+      await beat(1300);
+      await tapInvite();
+      launch();
+    } catch (e) { if (e !== STOP) throw e; }
+  }
+
+  // ---------- Start: lock screen with a notification, unless sound is already allowed ----------
+  const CHAT_OPEN_DELAY = 1700;   // after she taps the notification
+  let chatOpened = false;
+  function openChat() {
+    if (chatOpened) return;
+    chatOpened = true;
+    prepareSound();               // this runs inside her tap, so sound is allowed from here on
+    show('chat');
+    runChat(CHAT_OPEN_DELAY);
+  }
+
+  async function boot() {
+    ensureSfx();
+    await wait(250);
+    if (soundOn()) {              // this browser already allows sound: start the chat by itself
+      show('chat'); runChat(CHAT_START_DELAY); return;
+    }
+    const now = new Date();
+    $('lsTime').textContent = now.toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' }).replace(/\s?[AP]M/i, '');
+    $('lsDate').textContent = now.toLocaleDateString([], { weekday: 'long', month: 'long', day: 'numeric' });
+    show('lock');
+    await wait(6000);             // a calm moment on the lock screen, then the message arrives
+    if (chatOpened) return;
+    $('notif').hidden = false; $('lsHint').hidden = false;
+    $('notif').addEventListener('click', openChat);
+    await wait(14000);            // if she never taps, carry on anyway (silently)
+    openChat();
+  }
+  boot();
 </script>
 </body>
 </html>
