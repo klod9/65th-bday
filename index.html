@@ -128,7 +128,7 @@
     background: rgba(248, 241, 228, .13);
     backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px);
     box-shadow: 0 14px 34px rgba(0, 0, 0, .4); font-family: var(--sans);
-    animation: notifIn .6s cubic-bezier(.3, 1.4, .5, 1) both, notifBuzz .5s ease .65s;
+    animation: notifIn .6s cubic-bezier(.3, 1.4, .5, 1) both, notifShake 2.8s ease-in-out .65s 3;
     transition: transform .15s ease;
   }
   .notif[hidden] { display: none; }
@@ -139,12 +139,11 @@
   .notif .ntext span { font-size: 18px; color: rgba(248, 241, 228, .8); }
   .notif em { align-self: flex-start; font-style: normal; font-size: 15px; color: rgba(248, 241, 228, .6); }
   @keyframes notifIn { from { opacity: 0; transform: translateY(-40px) scale(.96); } }
-  @keyframes notifBuzz {
-    0%, 100% { transform: none; }
-    20% { transform: translateX(-5px) rotate(-.6deg); }
-    40% { transform: translateX(5px) rotate(.6deg); }
-    60% { transform: translateX(-3px); }
-    80% { transform: translateX(2px); }
+  /* Three gentle sets: four small wiggles, then a 2 second rest before the next set */
+  @keyframes notifShake {
+    0%, 7.143%, 14.286%, 21.429%, 28.571%, 100% { transform: none; }
+    1.786%, 8.929%, 16.071%, 23.214% { transform: rotate(-2deg) translateX(-1.5px); }
+    5.357%, 12.5%, 19.643%, 26.786% { transform: rotate(2deg) translateX(1.5px); }
   }
   .ls-hint { margin-top: 18px; font-size: 18px; color: var(--gold); opacity: 0; animation: hintIn .6s ease 1.2s forwards; }
   .ls-hint[hidden] { display: none; }
@@ -308,6 +307,16 @@
   }
   .ripple.go { animation: rip .6s ease-out; }
   @keyframes rip { from { opacity: .9; transform: scale(.4); } to { opacity: 0; transform: scale(4.5); } }
+  /* Round cursor: the same circle as the tapping finger, on every screen */
+  .cursor {
+    position: fixed; left: 0; top: 0; z-index: 30; width: 38px; height: 38px; margin: -19px 0 0 -19px;
+    border-radius: 50%; background: rgba(248, 241, 228, .35); border: 2px solid rgba(248, 241, 228, .9);
+    box-shadow: 0 4px 14px rgba(0, 0, 0, .4); opacity: 0; pointer-events: none; will-change: translate;
+    transition: opacity .25s ease, scale .15s ease, background .15s ease;
+  }
+  .cursor.show { opacity: 1; }
+  .cursor.tap { scale: .7; background: rgba(248, 241, 228, .65); }
+  @media (hover: hover) and (pointer: fine) { *, *::before, *::after { cursor: none !important; } }
   #launch {
     position: fixed; inset: 0; z-index: 20; visibility: hidden; pointer-events: none;
     background: radial-gradient(ellipse at 50% 38%, var(--wine-glow) 0%, var(--wine) 48%, var(--wine-deep) 100%);
@@ -549,6 +558,7 @@
 <div class="finger" id="finger" aria-hidden="true"></div>
 <div class="ripple" id="ripple" aria-hidden="true"></div>
 <div id="launch" aria-hidden="true"></div>
+<div class="cursor" id="cursor" aria-hidden="true"></div>
 
 <section class="stage" id="welcome">
   <div class="welcome-card">
@@ -671,12 +681,12 @@
   // Curated order: elders first, then relatives, a long heartfelt message in
   // the middle, and the grandchildren as the grand finale.
   const videoList = [
-    'video17.mp4', // two elder ladies, warm opening wishes
+    'video19.mp4', // two elder ladies, warm opening wishes
     'video16.mp4', // elder couple
     'video14.mp4', // uncle, cheerful greeting
     'video12.mp4', // short, sincere message
     'video20.mp4', // new clip, plays right before the longest message
-    'video19.mp4', // longest, heartfelt message
+    'video17.mp4', // longest, heartfelt message
     'video15.mp4', // couple on the sofa
     'video18.mp4', // couple in the car
     'video13.mp4', // playground, waving with the dog
@@ -998,6 +1008,42 @@
   goBtn.addEventListener('pointerenter', e => { if (e.pointerType === 'mouse' && !unlocked && !allOk()) { wrong(); dodge(); } });
   goBtn.addEventListener('pointerdown', e => { if (!unlocked && !allOk()) { e.preventDefault(); wrong(); dodge(); } });
 
+  // ---------- Tap feedback everywhere ----------
+  // Every real tap or click shows the same finger and gold ripple used when the
+  // invitation is tapped in the chat, so the cursor feels the same on every screen.
+  function tapFx(x, y) {
+    if (matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+    const rp = document.createElement('div');
+    rp.className = 'ripple go';
+    rp.style.left = x + 'px'; rp.style.top = y + 'px';
+    document.body.append(rp);
+    rp.addEventListener('animationend', () => rp.remove());
+  }
+
+  // The round cursor follows the mouse (or a finger) everywhere, shrinks on press,
+  // and stays visible while scrolling. The system arrow is hidden on mouse devices.
+  const cursorEl = $('cursor');
+  let cursorHide = 0;
+  const hideLater = ms => {
+    clearTimeout(cursorHide);
+    cursorHide = setTimeout(() => { if (!cursorEl.classList.contains('tap')) cursorEl.classList.remove('show'); }, ms);
+  };
+  const placeCursor = e => {
+    cursorEl.style.translate = e.clientX + 'px ' + e.clientY + 'px';
+    cursorEl.classList.add('show');
+    hideLater(2000); // hides after 2 seconds without movement, returns on the next move
+  };
+  const liftCursor = e => {
+    cursorEl.classList.remove('tap');
+    hideLater(e.pointerType === 'mouse' ? 2000 : 350);
+  };
+  window.addEventListener('pointermove', placeCursor, { passive: true });
+  window.addEventListener('pointerdown', e => { placeCursor(e); cursorEl.classList.add('tap'); tapFx(e.clientX, e.clientY); }, { passive: true });
+  window.addEventListener('pointerup', liftCursor, { passive: true });
+  window.addEventListener('pointercancel', liftCursor, { passive: true });
+  window.addEventListener('wheel', placeCursor, { passive: true });
+  document.documentElement.addEventListener('mouseleave', () => cursorEl.classList.remove('show'));
+
   // ---------- Unwrapping: the gift opens by itself ----------
   // No question to answer: she already chose to open it by tapping the attachment.
   const giftbox = $('giftbox'), wTitle = $('wTitle'), wSub = $('wSub');
@@ -1268,9 +1314,7 @@
       ding(); addInvite();
       await beat(1500);
       await typeReply('Oh, what is this?');
-      await beat(1300);
-      await tapInvite();
-      launch();
+      // The invitation now waits for a real tap or click (no automatic tap)
     } catch (e) { if (e !== STOP) throw e; }
   }
 
@@ -1295,7 +1339,7 @@
     $('lsTime').textContent = now.toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' }).replace(/\s?[AP]M/i, '');
     $('lsDate').textContent = now.toLocaleDateString([], { weekday: 'long', month: 'long', day: 'numeric' });
     show('lock');
-    await wait(6000);             // a calm moment on the lock screen, then the message arrives
+    await wait(5000);             // a calm moment on the lock screen, then the message arrives
     if (chatOpened) return;
     $('notif').hidden = false; $('lsHint').hidden = false;
     $('notif').addEventListener('click', openChat);
