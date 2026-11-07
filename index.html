@@ -100,6 +100,41 @@
     text-wrap: balance;
   }
 
+  /* Chapter cards: introduce each group before its greetings */
+  #chapter .kicker, #song .kicker { font: 700 clamp(14px, calc(1.8vw + 2px), 20px)/1 var(--sans); letter-spacing: .32em; text-transform: uppercase; color: var(--gold); }
+  #chapter h1 { font-size: clamp(36px, calc(6vw + 2px), 68px); text-wrap: balance; }
+
+  /* A personalised song: record, equalizer and progress, with a skip button */
+  #song .song-card { width: min(640px, 100%); display: flex; flex-direction: column; align-items: center; text-align: center; }
+  .stage.on .song-card > * { animation: reveal 1.4s var(--ease) both; }
+  .stage.on .song-card > :nth-child(2) { animation-delay: .2s; }
+  .stage.on .song-card > :nth-child(3) { animation-delay: .4s; }
+  .stage.on .song-card > :nth-child(4) { animation-delay: .55s; }
+  .stage.on .song-card > :nth-child(n+5) { animation-delay: .7s; }
+  .disc { width: clamp(120px, 26vw, 170px); aspect-ratio: 1; margin: 22px 0 18px; filter: drop-shadow(0 14px 22px rgba(0, 0, 0, .45)); }
+  .disc svg { width: 100%; height: 100%; animation: spin 7s linear infinite; animation-play-state: paused; }
+  #song.playing .disc svg, #song.playing .eq i { animation-play-state: running; }
+  @keyframes spin { to { transform: rotate(360deg); } }
+  #song h1 { font-size: clamp(30px, calc(5.4vw + 2px), 52px); line-height: 1.2; text-wrap: balance; }
+  #song .sub { margin-top: 8px; font-size: clamp(20px, calc(2.4vw + 2px), 26px); color: rgba(248, 241, 228, .85); text-wrap: balance; }
+  .songcredit { margin-top: 10px; font: 700 15px/1.4 var(--sans); letter-spacing: .2em; text-transform: uppercase; color: var(--gold); text-wrap: balance; }
+  .songcredit[hidden] { display: none; }
+  .eq { display: flex; gap: 6px; height: 30px; align-items: flex-end; margin: 20px 0 14px; }
+  .eq i { width: 5px; height: 100%; border-radius: 3px; background: var(--gold); transform-origin: bottom; transform: scaleY(.2); animation: eq 1s ease-in-out infinite; animation-play-state: paused; }
+  .eq i:nth-child(2) { animation-delay: -.3s; } .eq i:nth-child(3) { animation-delay: -.6s; }
+  .eq i:nth-child(4) { animation-delay: -.15s; } .eq i:nth-child(5) { animation-delay: -.45s; }
+  @keyframes eq { 0%, 100% { transform: scaleY(.2); } 50% { transform: scaleY(1); } }
+  .prog { width: min(420px, 100%); display: flex; align-items: center; gap: 12px; font-size: 16px; color: rgba(248, 241, 228, .7); font-variant-numeric: tabular-nums; }
+  .prog .bar { flex: 1; height: 4px; border-radius: 4px; background: rgba(248, 241, 228, .18); overflow: hidden; }
+  .prog .bar b { display: block; width: 0; height: 100%; background: linear-gradient(90deg, var(--gold-deep), var(--gold)); }
+  .song-actions { margin-top: 22px; display: flex; gap: 12px; flex-wrap: wrap; justify-content: center; }
+  .songbtn { padding: 10px 26px; border-radius: 12px; border: 1px solid rgba(217, 184, 115, .55); background: transparent; color: var(--gold); font: 700 18px var(--sans); cursor: pointer; touch-action: manipulation; }
+  .songbtn.main { border: 0; background: linear-gradient(180deg, #e6c98a, var(--gold-deep)); color: var(--ink); }
+  .songbtn:hover { filter: brightness(1.12); }
+  .songbtn:focus-visible, .songlink:focus-visible { outline: 3px solid var(--gold); outline-offset: 3px; }
+  .songlink { margin-top: 16px; font-size: 18px; color: var(--gold); }
+  .songlink[hidden] { display: none; }
+
   /* Player: full video always visible, scaled to fit any screen */
   #player { padding: 0; background: #000; }
   .player { position: absolute; inset: 0; }
@@ -108,7 +143,6 @@
     width: 100%; height: 100%;
     object-fit: contain;
     background: #000;
-    transition: opacity .6s ease;
   }
   video.fade { opacity: 0; }
 
@@ -514,6 +548,7 @@
     .gb-lid, .gb-bow, .glow { transition-duration: .01s; }
     .bubble, .invite, .invite.ready, .typing i, .invite .art svg, .invite .tw, .composer .type.live::after, .notif, .ls-hint { animation: none; }
     .kbd-wrap { transition-duration: .01s; }
+    .disc svg, .eq i, .stage.on .song-card > * { animation: none; }
     .ls-hint { opacity: .9; }
     #launch.go { transition-duration: .01s; }
   }
@@ -528,9 +563,9 @@
     <svg class="ls-icon" viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="5" y="11" width="14" height="9" rx="2.5"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg>
     <div class="ls-time" id="lsTime"></div>
     <div class="ls-date" id="lsDate"></div>
-    <button type="button" class="notif" id="notif" hidden aria-label="Open the new message from The Alvarez Family">
-      <span class="avatar" aria-hidden="true">AF</span>
-      <span class="ntext"><strong>The Alvarez Family</strong><span>Sent you a message</span></span>
+    <button type="button" class="notif" id="notif" hidden aria-label="Open the new message from your loved ones">
+      <span class="avatar" aria-hidden="true">♥</span>
+      <span class="ntext"><strong>Your Loved Ones</strong><span>Sent you a message</span></span>
       <em>now</em>
     </button>
     <p class="ls-hint" id="lsHint" hidden>Tap the message to open it</p>
@@ -538,11 +573,11 @@
 </section>
 
 <section class="stage" id="chat">
-  <div class="phone" role="group" aria-label="Message conversation with The Alvarez Family">
+  <div class="phone" role="group" aria-label="Message conversation with your loved ones">
     <header class="chat-head">
       <svg class="ico" viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 5l-7 7 7 7"/></svg>
-      <div class="avatar" aria-hidden="true">AF</div>
-      <div class="who"><strong>The Alvarez Family</strong><span>Active now</span></div>
+      <div class="avatar" aria-hidden="true">♥</div>
+      <div class="who"><strong>Your Loved Ones</strong><span>Active now</span></div>
       <svg class="ico" viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 4h4l2 5-2.5 1.5a11 11 0 0 0 5 5L15 13l5 2v4a2 2 0 0 1-2 2A15 15 0 0 1 3 6a2 2 0 0 1 2-2z"/></svg>
       <svg class="ico" viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="6" width="12" height="12" rx="2.5"/><path d="M15 10.5l6-3.5v10l-6-3.5"/></svg>
     </header>
@@ -654,13 +689,51 @@
   <div class="card">
     <h1>Happy 65th Birthday!</h1>
     <div class="rule"></div>
-    <p class="sub">With all our love, <strong>The Alvarez Family</strong></p>
+    <p class="sub">With all our love, <strong>Your Scholars, Colleagues &amp; Family</strong></p>
   </div>
 </section>
 
+<section class="stage" id="chapter">
+  <div class="card">
+    <p class="kicker" id="chKicker">With love from</p>
+    <div class="rule"></div>
+    <h1 id="chName"></h1>
+  </div>
+</section>
+
+<section class="stage" id="song">
+  <div class="song-card">
+    <p class="kicker">A song for you</p>
+    <div class="disc" aria-hidden="true">
+      <svg viewBox="0 0 120 120">
+        <defs><linearGradient id="gGold4" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#ecd29a"/><stop offset="1" stop-color="#b48f4b"/></linearGradient></defs>
+        <circle cx="60" cy="60" r="58" fill="#150610" stroke="#d9b873" stroke-opacity=".55"/>
+        <circle cx="60" cy="60" r="50" fill="none" stroke="#f8f1e4" stroke-opacity=".08"/>
+        <circle cx="60" cy="60" r="43" fill="none" stroke="#f8f1e4" stroke-opacity=".08"/>
+        <circle cx="60" cy="60" r="36" fill="none" stroke="#f8f1e4" stroke-opacity=".08"/>
+        <path d="M18 40 A46 46 0 0 1 40 18" fill="none" stroke="#f8f1e4" stroke-opacity=".28" stroke-width="3" stroke-linecap="round"/>
+        <circle cx="60" cy="60" r="20" fill="url(#gGold4)"/>
+        <circle cx="60" cy="60" r="3.5" fill="#230c18"/>
+      </svg>
+    </div>
+    <h1 id="songTitle">A Song for Cora</h1>
+    <p class="sub" id="songFrom"></p>
+    <p class="songcredit" id="songCredit" hidden></p>
+    <div class="eq" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i></div>
+    <div class="prog"><span id="songNow">0:00</span><div class="bar"><b id="songBar"></b></div><span id="songLen">0:00</span></div>
+    <div class="song-actions">
+      <button type="button" class="songbtn main" id="songPlay" hidden>Play the song</button>
+      <button type="button" class="songbtn" id="songSkip">Skip</button>
+    </div>
+    <a class="songlink" id="songLink" target="_blank" rel="noopener" hidden>Listen to your song online</a>
+  </div>
+</section>
+<audio id="songAudio" preload="auto"></audio>
+
 <section class="stage" id="player">
   <div class="player">
-    <video id="video" playsinline preload="auto"></video>
+    <video id="video" class="fade" playsinline preload="auto"></video>
+    <video id="video2" class="fade" playsinline preload="auto"></video>
   </div>
 </section>
 
@@ -668,7 +741,7 @@
   <div class="card">
     <h1>Wishing You a Blessed &amp; Joyful 65th Year!</h1>
     <div class="rule"></div>
-    <p class="body">Thank you for every kindness, every meal, and every lesson. May this year bring you good health, laughter, and all the love you have given us. We are so proud to be your family.</p>
+    <p class="body">Thank you for every kindness, every lesson, and every life you have touched. May this year bring you good health, laughter, and all the love you have given us. We are so grateful to have you in our lives.</p>
   </div>
 </section>
 
@@ -678,57 +751,187 @@
 </button>
 
 <script>
-  // Curated order: elders first, then relatives, a long heartfelt message in
-  // the middle, and the grandchildren as the grand finale.
-  const videoList = [
-    'video19.mp4', // longest, heartfelt message
-    'video17.mp4', // two elder ladies, warm opening wishes
-    'video14.mp4', // uncle, cheerful greeting
-    'video12.mp4', // short, sincere message
-    'video20.mp4', // new clip, plays right before the longest message
-    'video15.mp4', // couple on the sofa
-    'video18.mp4', // couple in the car
-    'video13.mp4', // playground, waving with the dog
-    'video11.mp4',  // the kids, grand finale
-    'video16.mp4' // elder couple
-  ];
+  // The greetings play group by group, in this order. Each group opens with a
+  // chapter card. A group with no videos yet is skipped, so the Mallabo family
+  // and the daughters can be added later by listing their files below.
+  const groups = [
+    { name: 'Your Scholars', videos: [
+      'scholarvideo1.mp4', 'scholarvideo2.mp4', 'scholarvideo3.mp4', 'scholarvideo4.mp4', 'scholarvideo5.mp4',
+      'scholarvideo6.mp4', 'scholarvideo7.mp4'
+    ]},
+    { name: 'Your Former Colleagues at Miriam College', videos: [
+      'miriamvideo1.mp4', 'miriamvideo2.mp4', 'miriamvideo3.mp4', 'miriamvideo4.mp4'
+    ]},
+    { name: 'The Mallabo Family', videos: [
+      // add the Mallabo family videos here, for example 'mallabovideo1.mp4'
+      // their personalised song plays after any videos; download it and save it as mallabo-song.mp3
+      { song: 'mallabo-song.mp3', title: 'A Song for Cora', from: 'A gift from the Mallabo Family', credit: 'Lovingly prepared by Delia Rica M. Flores',
+        link: 'https://foreversongs.com/en-PH/song/t/187a6ce059ac05a76310caa72cc0452fa700f82ec8076d537c5c3064ca5857ee' }
+    ]},
+    { name: 'The Alvarez Family', videos: [
+      'video19.mp4', // longest, heartfelt message
+      'video17.mp4', // two elder ladies, warm opening wishes
+      'video14.mp4', // uncle, cheerful greeting
+      'video12.mp4', // short, sincere message
+      'video20.mp4', // new clip, plays right before the longest message
+      'video15.mp4', // couple on the sofa
+      'video18.mp4', // couple in the car
+      'video13.mp4', // playground, waving with the dog
+      'video11.mp4',  // the kids
+      'video16.mp4' // elder couple
+    ]},
+    { name: 'Your Daughters and Son', videos: [
+      'daughtervideo1.mp4',
+      'sonvideo2.mp4',
+      'daughtervideo3part1.mp4', 'daughtervideo3part2.mp4', 'daughtervideo3part3.mp4', // daughter 3, in three parts
+      'sonvideo1.mp4'
+      
+    ]}
+  ].filter(g => g.videos.length);
+
+  const videoList = groups.flatMap(g => g.videos);
+  const chapterAt = {}; // clip number -> the group that starts there
+  let n = 0;
+  groups.forEach(g => { chapterAt[n] = g; n += g.videos.length; });
 
   const INTRO_MS = 6000;
+  const CHAPTER_MS = 4500;
   const $ = id => document.getElementById(id);
   const show = id => document.querySelectorAll('.stage').forEach(s => s.classList.toggle('on', s.id === id));
   const wait = ms => new Promise(r => setTimeout(r, ms));
 
-  const video = $('video');
-  let index = 0;
+  // Two stacked players take turns: while one plays, the other quietly loads the
+  // next clip, so every clip starts the instant the one before it ends.
+  const vids = [$('video'), $('video2')];
+  let cur = 0, index = 0;
+  const player = () => vids[cur];
 
   // Prefer sound; fall back to muted autoplay if the browser blocks it.
-  async function start() {
-    video.muted = false;
-    try { await video.play(); }
-    catch { video.muted = true; try { await video.play(); } catch { /* skip handled by error event */ } }
+  async function start(el) {
+    el.muted = false;
+    try { await el.play(); }
+    catch { el.muted = true; try { await el.play(); } catch { /* skip handled by error event */ } }
   }
 
+  function loadInto(el, i) {
+    el.classList.add('fade');
+    delete el.dataset.bad;
+    el.dataset.clip = i;
+    el.src = videoList[i];
+    el.load();
+  }
+
+  // Gets the following clip ready in the idle player
+  function prepareNext() {
+    const j = index + 1, idle = vids[1 - cur];
+    if (j < videoList.length && typeof videoList[j] === 'string' && idle.dataset.clip !== String(j)) loadInto(idle, j);
+  }
+
+  // Hands over to the idle player, which already holds this clip. It becomes visible
+  // on its first frame (see the 'playing' listener below), so there is no black gap.
   async function playCurrent() {
-    video.classList.add('fade');
-    await wait(250);
-    video.src = videoList[index];
+    if (typeof videoList[index] !== 'string') return playSong(videoList[index]);
+    if (!$('player').classList.contains('on')) show('player'); // coming back from the song
+    const idle = vids[1 - cur];
+    if (idle.dataset.bad === String(index)) return next(); // the file is missing: skip it
+    if (idle.dataset.clip !== String(index)) loadInto(idle, index);
+    cur = 1 - cur;
     setVideoGain();
-    video.load();
-    video.classList.remove('fade');
-    await start();
+    await start(idle);
+  }
+
+  // The player keeps the last frame of a finished clip. Clearing it while a chapter
+  // card covers the screen stops that old frame from flashing back afterwards.
+  function clearVideo() {
+    const old = player();
+    old.pause();
+    old.classList.add('fade');
+    old.removeAttribute('src');
+    delete old.dataset.clip;
+    old.load();
+  }
+
+  // ---------- A personalised song ----------
+  // A group can include a song as { song: 'file.mp3', title, from, link }. It plays on
+  // its own card, the background music rests while it plays, and the show carries on
+  // when it ends. Skip is always available.
+  const songAudio = $('songAudio'), songEl = $('song');
+  let songFinish = null;
+  const fmt = t => isFinite(t) ? Math.floor(t / 60) + ':' + String(Math.floor(t % 60)).padStart(2, '0') : '0:00';
+
+  async function playSong(item) {
+    clearVideo();
+    $('songTitle').textContent = item.title || 'A Song for Cora';
+    $('songFrom').textContent = item.from || '';
+    $('songCredit').textContent = item.credit || ''; $('songCredit').hidden = !item.credit;
+    songEl.classList.remove('playing', 'failed');
+    $('songPlay').hidden = true; $('songLink').hidden = true;
+    $('songSkip').textContent = 'Skip';
+    $('songBar').style.width = '0'; $('songNow').textContent = '0:00'; $('songLen').textContent = '0:00';
+    if (item.link) $('songLink').href = item.link;
+    let done = false;
+    songFinish = () => {
+      if (done) return;
+      done = true; songFinish = null;
+      songAudio.pause();
+      next();
+    };
+    setMusic(0, 1.2);
+    songAudio.src = item.song;
+    songAudio.load();
+    show('song');
+    try { await songAudio.play(); }
+    catch {
+      await wait(400);
+      if (!songEl.classList.contains('failed')) $('songPlay').hidden = false; // the browser wants a tap first
+    }
+  }
+  songAudio.addEventListener('playing', () => { songEl.classList.add('playing'); $('songPlay').hidden = true; });
+  songAudio.addEventListener('pause', () => songEl.classList.remove('playing'));
+  songAudio.addEventListener('loadedmetadata', () => { $('songLen').textContent = fmt(songAudio.duration); });
+  songAudio.addEventListener('timeupdate', () => {
+    $('songNow').textContent = fmt(songAudio.currentTime);
+    if (songAudio.duration) $('songBar').style.width = (songAudio.currentTime / songAudio.duration * 100) + '%';
+  });
+  songAudio.addEventListener('ended', () => { if (songFinish) songFinish(); });
+  songAudio.addEventListener('error', () => {   // file missing: offer the online link and a way to continue
+    if (!songFinish) return;
+    songEl.classList.add('failed');
+    $('songPlay').hidden = true;
+    $('songLink').hidden = !$('songLink').getAttribute('href');
+    $('songSkip').textContent = 'Continue';
+  });
+  $('songSkip').addEventListener('click', () => { if (songFinish) songFinish(); });
+  $('songPlay').addEventListener('click', () => songAudio.play().catch(() => {}));
+
+  // Shows the chapter card when a new group begins, then plays the clip
+  async function beginClip() {
+    const g = chapterAt[index];
+    if (g) {
+      $('chName').textContent = g.name;
+      setMusic(LEVEL.full, 1.5);
+      show('chapter');
+      await wait(1600); // the card has fully faded in
+      clearVideo();
+      const idle = vids[1 - cur];
+      if (typeof videoList[index] === 'string' && idle.dataset.clip !== String(index)) loadInto(idle, index); // loads while the card is showing
+      await wait(CHAPTER_MS - 1600);
+      show('player');
+      await wait(600); // the clip starts as the screen fades in, with music covering the change
+    }
+    return playCurrent();
   }
 
   async function next() {
     index++;
-    if (index < videoList.length) return playCurrent();
+    if (index < videoList.length) return beginClip();
     setMusic(LEVEL.full, 2.5);
     show('outro');
   }
 
   // ---------- Background music ----------
   // Plays from the moment the gate opens and never stops: full volume for the
-  // intro and closing, softly under the video messages, and a small swell in
-  // the brief moments between clips so there is never silence.
+  // intro and closing and on each chapter card, and softly under the video messages.
   const music = $('music'), musicBtn = $('musicBtn');
   const LEVEL = { full: 0.55, gap: 0.3, duck: 0.1 };
   // Video loudness: browsers cap a video's own volume at 100%, so a Web Audio
@@ -737,6 +940,10 @@
   // CLIP_GAIN fine-tunes a single clip: raise a quiet one, lower a loud one.
   const VIDEO_BOOST = 2.5;
   const CLIP_GAIN = {
+    'scholarvideo1.mp4': 1, 'scholarvideo2.mp4': 1, 'scholarvideo3.mp4': 1, 'scholarvideo4.mp4': 1, 'scholarvideo5.mp4': 1,
+    'scholarvideo6.mp4': 1, 'scholarvideo7.mp4': 1,
+    'miriamvideo1.mp4': 1, 'miriamvideo2.mp4': 1, 'miriamvideo3.mp4': 1, 'miriamvideo4.mp4': 1,
+    'daughtervideo1.mp4': 1, 'daughtervideo3part1.mp4': 1, 'daughtervideo3part2.mp4': 1, 'daughtervideo3part3.mp4': 1, 'sonvideo1.mp4': 1, 'sonvideo2.mp4': 1,
     'video17.mp4': 1, 'video16.mp4': 1, 'video14.mp4': 1, 'video12.mp4': 1, 'video20.mp4': 1, 'video19.mp4': 1,
     'video15.mp4': 1, 'video18.mp4': 1, 'video13.mp4': 1, 'video11.mp4': 1
   };
@@ -777,7 +984,8 @@
         const limiter = ctx.createDynamicsCompressor();
         limiter.threshold.value = -8; limiter.knee.value = 6; limiter.ratio.value = 14;
         limiter.attack.value = 0.003; limiter.release.value = 0.2;
-        ctx.createMediaElementSource(video).connect(videoGain).connect(limiter).connect(ctx.destination);
+        videoGain.connect(limiter).connect(ctx.destination);
+        vids.forEach(v => ctx.createMediaElementSource(v).connect(videoGain));
         setVideoGain();
       } catch { videoGain = null; }
     }
@@ -796,22 +1004,27 @@
     applyLevel(0.3);
   });
 
-  // Warm up the next clip so it starts the instant the current one ends
-  const preloader = document.createElement('video');
-  preloader.preload = 'auto'; preloader.muted = true;
-  const warmNext = () => { if (index + 1 < videoList.length) preloader.src = videoList[index + 1]; };
-
-  video.addEventListener('playing', () => { setMusic(LEVEL.duck, 0.8); warmNext(); });
-  const betweenClips = () => setMusic(LEVEL.gap, 0.4);
-  video.addEventListener('ended', betweenClips);
-  video.addEventListener('error', betweenClips);
-
-  video.addEventListener('ended', next);
-  video.addEventListener('error', next); // never stall on a missing file
+  vids.forEach(el => {
+    el.addEventListener('playing', () => {
+      if (el !== player()) return;
+      const other = vids[1 - cur];
+      el.classList.remove('fade');   // show the new clip...
+      other.classList.add('fade');   // ...and hide the old one in the same instant
+      other.pause();
+      setMusic(LEVEL.duck, 0.8);
+      prepareNext();
+    });
+    const finished = () => {
+      if (el !== player()) { if (el.dataset.clip) el.dataset.bad = el.dataset.clip; return; } // idle player hit a missing file
+      next(); // the next clip starts right away, with no pause
+    };
+    el.addEventListener('ended', finished);
+    el.addEventListener('error', finished); // never stall on a missing file
+  });
 
   // If autoplay forced muted playback, any touch or key press restores sound.
   ['pointerdown', 'keydown'].forEach(ev =>
-    window.addEventListener(ev, () => { video.muted = false; }, { once: true })
+    window.addEventListener(ev, () => vids.forEach(v => { v.muted = false; }), { once: true })
   );
 
   // ---------- Password gate: date dials ----------
@@ -847,7 +1060,7 @@
     } catch { /* sound is optional */ }
   }
   const tick = () => blip(1500, 0.04, 0.035);
-  const lockedIn = () => blip(880, 0.16, 0.06);
+  const lockedIn = () => dialLockSound();
   const chime = () => [784, 988, 1175, 1568].forEach((f, k) => blip(f, 0.5, 0.06, k * 0.11));
 
   const dialEl = k => dialsEl.querySelector(`[data-kind="${k}"]`);
@@ -867,11 +1080,12 @@
 
   function step(k, dir) {
     if (unlocked) return;
-    const d = dialData[k];
+    const d = dialData[k], wasReady = allOk();
     d.i = (d.i + dir + d.vals.length) % d.vals.length;
     render(k, dir);
     if (!dialOk(k) || !allOk()) tick();
     const ready = allOk();
+    if (ready && !wasReady) dialsReadySound();
     goBtn.classList.toggle('ready', ready);
     if (ready) { homeAgain(); msg.textContent = 'That is the one! Tap Open.'; msg.style.color = 'var(--gold)'; }
     else { msg.textContent = ''; msg.style.color = ''; }
@@ -998,9 +1212,7 @@
     await wait(1900);
     show('intro');
     await wait(INTRO_MS);
-    show('player');
-    await wait(600); // the first clip starts as the screen fades in, with music covering the change
-    playCurrent();
+    await beginClip();
   }
 
   goBtn.addEventListener('click', submit);
@@ -1059,13 +1271,14 @@
 
   async function runUnwrap() {
     $('welcome').addEventListener('click', toGate, { once: true }); // tap anywhere to skip ahead
+    giftAppearSound();
     await wait(1800);                      // gift pops in, text fades up
     if (unwrapDone) return;
-    giftbox.classList.add('shake');        // it shakes, then...
+    giftbox.classList.add('shake'); giftShakeSound();        // it shakes, then...
     await wait(1450);
     if (unwrapDone) return;
     giftbox.classList.remove('shake');
-    giftbox.classList.add('open');         // ...the lid and bow pop off
+    giftbox.classList.add('open'); giftOpenSound();         // ...the lid and bow pop off
     await wait(900);
     if (unwrapDone) return;
     await swapText('It is ready for you', 'One last step: enter the password.');
@@ -1101,7 +1314,7 @@
   function addInvite() {
     invite = document.createElement('button');
     invite.type = 'button'; invite.className = 'invite';
-    invite.setAttribute('aria-label', 'Open the surprise from The Alvarez Family');
+    invite.setAttribute('aria-label', 'Open the surprise from your loved ones');
     invite.innerHTML = `
       <span class="art"><svg viewBox="0 0 120 120" aria-hidden="true">
         <defs><linearGradient id="goldGrad3" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#ecd29a"/><stop offset="1" stop-color="#b48f4b"/></linearGradient></defs>
@@ -1132,9 +1345,12 @@
     try { sfx = sfx || new AC(); } catch { return null; }
     return sfx;
   }
+  let soundArmed = false;
   function prepareSound() {
     if (!ensureSfx()) return;
     sfx.resume().catch(() => {});
+    if (soundArmed) return;
+    soundArmed = true;
     const enable = () => { if (sfx) sfx.resume().catch(() => {}); };
     ['pointerdown', 'keydown', 'touchstart'].forEach(ev => window.addEventListener(ev, enable, { passive: true }));
   }
@@ -1182,6 +1398,91 @@
     o.connect(g).connect(sfx.destination);
     o.start(t); o.stop(t + 0.2);
   }
+
+  // ----- Sound effects: notification, tapping, gift and dials -----
+  // Runs a sound as soon as audio is allowed. A sound that would arrive late
+  // (for example because the browser was still waiting for a first tap) is dropped.
+  function playFx(fn, maxLateMs = 1500) {
+    if (!ensureSfx()) return;
+    if (sfx.state === 'running') { fn(sfx.currentTime + 0.02); return; }
+    const asked = performance.now();
+    sfx.resume().then(() => {
+      if (sfx.state === 'running' && performance.now() - asked < maxLateMs) fn(sfx.currentTime + 0.02);
+    }).catch(() => {});
+  }
+  function tone(t, freq, dur, vol, type = 'sine', endFreq) {
+    const o = sfx.createOscillator(), g = sfx.createGain();
+    o.type = type; o.frequency.setValueAtTime(freq, t);
+    if (endFreq) o.frequency.exponentialRampToValueAtTime(endFreq, t + dur);
+    g.gain.setValueAtTime(0.0001, t);
+    g.gain.exponentialRampToValueAtTime(vol, t + 0.01);
+    g.gain.exponentialRampToValueAtTime(0.0001, t + dur);
+    o.connect(g).connect(sfx.destination);
+    o.start(t); o.stop(t + dur + 0.05);
+  }
+  let fxNoise = null;
+  function noiseHit(t, freq, q, dur, vol, sweepTo) {
+    if (!fxNoise) {
+      fxNoise = sfx.createBuffer(1, sfx.sampleRate, sfx.sampleRate);
+      const d = fxNoise.getChannelData(0);
+      for (let i = 0; i < d.length; i++) d[i] = Math.random() * 2 - 1;
+    }
+    const src = sfx.createBufferSource(), f = sfx.createBiquadFilter(), g = sfx.createGain();
+    src.buffer = fxNoise; f.type = 'bandpass'; f.Q.value = q; f.frequency.setValueAtTime(freq, t);
+    if (sweepTo) f.frequency.exponentialRampToValueAtTime(sweepTo, t + dur);
+    g.gain.setValueAtTime(0.0001, t);
+    g.gain.exponentialRampToValueAtTime(vol, t + Math.min(0.02, dur / 3));
+    g.gain.exponentialRampToValueAtTime(0.0001, t + dur);
+    src.connect(f).connect(g).connect(sfx.destination);
+    src.start(t); src.stop(t + dur + 0.02);
+  }
+
+  // Message arrives on the lock screen: a bright three-note tone
+  const notifTone = () => playFx(t => {
+    [[988, 0], [1318.5, 0.14], [1760, 0.28]].forEach(([f, d]) => {
+      tone(t + d, f, 0.6, 0.13);
+      tone(t + d, f * 2, 0.35, 0.025, 'triangle');
+    });
+  });
+  // Tapping the invitation: a soft tap, then a rising whoosh as the screen opens
+  const tapSound = () => playFx(t => {
+    tone(t, 520, 0.09, 0.16, 'sine', 300);
+    noiseHit(t, 2400, 1.2, 0.04, 0.12);
+    tone(t + 0.06, 400, 0.7, 0.05, 'sine', 1300);
+    noiseHit(t + 0.05, 500, 0.8, 0.8, 0.07, 2400);
+  }, 400);
+  // Gift: pops in, rattles while it shakes, then the lid flies off with a sparkle
+  const giftAppearSound = () => playFx(t => {
+    tone(t, 260, 0.3, 0.09, 'sine', 620);
+    noiseHit(t, 600, 0.8, 0.4, 0.04, 1800);
+    tone(t + 0.22, 1568, 0.35, 0.04);
+  }, 400);
+  const giftShakeSound = () => playFx(t => {
+    for (let k = 0; k < 14; k++) {              // matches the 7 quick wiggles of the box
+      const at = t + k * 0.1 + 0.05;
+      tone(at, k % 2 ? 150 : 185, 0.08, 0.1, 'sine', 90);
+      noiseHit(at, 1100 + Math.random() * 900, 1.5, 0.05, 0.07);
+    }
+  }, 400);
+  const giftOpenSound = () => playFx(t => {
+    tone(t, 240, 0.14, 0.18, 'sine', 720);
+    noiseHit(t, 3000, 0.9, 0.12, 0.1);
+    noiseHit(t + 0.05, 1800, 0.7, 0.7, 0.06, 5000);
+    [1046.5, 1318.5, 1568, 2093, 2637].forEach((f, k) => {
+      tone(t + 0.12 + k * 0.08, f, 0.7, 0.07, 'triangle');
+      tone(t + 0.12 + k * 0.08, f / 2, 0.5, 0.03);
+    });
+  }, 400);
+  // Dials: a lock-click and ping for each correct dial, a rising chime when all three are right
+  const dialLockSound = () => playFx(t => {
+    noiseHit(t, 2600, 2, 0.03, 0.12);
+    tone(t, 220, 0.07, 0.12, 'sine', 110);
+    tone(t + 0.02, 1046.5, 0.3, 0.07);
+  }, 400);
+  const dialsReadySound = () => playFx(t => {
+    [523.25, 659.25, 783.99, 1046.5, 1318.5].forEach((f, k) => tone(t + 0.1 + k * 0.07, f, 0.6, 0.07, 'triangle'));
+    noiseHit(t + 0.1, 3500, 1, 0.5, 0.04, 6000);
+  }, 400);
 
   // ----- On-screen keyboard -----
   const kbdWrap = $('kbdWrap'), kbd = $('kbd');
@@ -1286,6 +1587,7 @@
   async function launch() {
     if (launched) return;
     launched = true;
+    tapSound();
     finger.classList.remove('show');
     const r = invite.getBoundingClientRect();
     invite.classList.add('pressed');
@@ -1330,7 +1632,7 @@
   }
 
   async function boot() {
-    ensureSfx();
+    prepareSound();               // sound switches on at the first tap, if the browser has not allowed it already
     await wait(250);
     if (soundOn()) {              // this browser already allows sound: start the chat by itself
       show('chat'); runChat(CHAT_START_DELAY); return;
@@ -1342,6 +1644,7 @@
     await wait(5000);             // a calm moment on the lock screen, then the message arrives
     if (chatOpened) return;
     $('notif').hidden = false; $('lsHint').hidden = false;
+    notifTone();
     $('notif').addEventListener('click', openChat);
     await wait(14000);            // if she never taps, carry on anyway (silently)
     openChat();
