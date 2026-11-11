@@ -104,36 +104,76 @@
   #chapter .kicker, #song .kicker { font: 700 clamp(14px, calc(1.8vw + 2px), 20px)/1 var(--sans); letter-spacing: .32em; text-transform: uppercase; color: var(--gold); }
   #chapter h1 { font-size: clamp(36px, calc(6vw + 2px), 68px); text-wrap: balance; }
 
-  /* A personalised song: record, equalizer and progress, with a skip button */
-  #song .song-card { width: min(640px, 100%); display: flex; flex-direction: column; align-items: center; text-align: center; }
+  /* The opening song: a lively record, equalizer and glow, with the lyrics in time */
+  #song { grid-template-columns: minmax(0, 1fr); }  /* long lyric lines must never widen the page */
+  #song .song-card { min-width: 0; width: min(680px, 100%); display: flex; flex-direction: column; align-items: center; text-align: center; }
   .stage.on .song-card > * { animation: reveal 1.4s var(--ease) both; }
   .stage.on .song-card > :nth-child(2) { animation-delay: .2s; }
   .stage.on .song-card > :nth-child(3) { animation-delay: .4s; }
-  .stage.on .song-card > :nth-child(4) { animation-delay: .55s; }
-  .stage.on .song-card > :nth-child(n+5) { animation-delay: .7s; }
-  .disc { width: clamp(120px, 26vw, 170px); aspect-ratio: 1; margin: 22px 0 18px; filter: drop-shadow(0 14px 22px rgba(0, 0, 0, .45)); }
-  .disc svg { width: 100%; height: 100%; animation: spin 7s linear infinite; animation-play-state: paused; }
-  #song.playing .disc svg, #song.playing .eq i { animation-play-state: running; }
+  .stage.on .song-card > :nth-child(4) { animation-delay: .5s; }
+  .stage.on .song-card > :nth-child(n+5) { animation-delay: .6s; }
+  .disc { position: relative; width: clamp(84px, 15vh, 130px); aspect-ratio: 1; margin: 14px 0 10px; filter: drop-shadow(0 12px 20px rgba(0, 0, 0, .45)); }
+  .disc::after {
+    content: ""; position: absolute; inset: -38%; z-index: -1; border-radius: 50%; opacity: 0;
+    background: radial-gradient(circle, rgba(236, 210, 154, .4) 0, rgba(236, 210, 154, 0) 65%);
+    animation: beat .55s ease-in-out infinite alternate;
+  }
+  #song.playing .disc::after { opacity: 1; }
+  @keyframes beat { from { transform: scale(.85); } to { transform: scale(1.12); } }
+  .disc svg { width: 100%; height: 100%; animation: spin 6s linear infinite; animation-play-state: paused; }
+  #song.playing .disc svg { animation-duration: 3.2s; animation-play-state: running; }
   @keyframes spin { to { transform: rotate(360deg); } }
-  #song h1 { font-size: clamp(30px, calc(5.4vw + 2px), 52px); line-height: 1.2; text-wrap: balance; }
-  #song .sub { margin-top: 8px; font-size: clamp(20px, calc(2.4vw + 2px), 26px); color: rgba(248, 241, 228, .85); text-wrap: balance; }
-  .songcredit { margin-top: 10px; font: 700 15px/1.4 var(--sans); letter-spacing: .2em; text-transform: uppercase; color: var(--gold); text-wrap: balance; }
+  #song h1 { font-size: clamp(26px, calc(4.2vw + 2px), 42px); line-height: 1.2; text-wrap: balance; }
+  #song .sub { margin-top: 6px; font-size: clamp(18px, calc(2vw + 2px), 24px); color: rgba(248, 241, 228, .85); text-wrap: balance; }
+  #song .sub:empty { display: none; }
+  .songcredit { margin-top: 8px; font: 700 14px/1.4 var(--sans); letter-spacing: .2em; text-transform: uppercase; color: var(--gold); text-wrap: balance; }
   .songcredit[hidden] { display: none; }
-  .eq { display: flex; gap: 6px; height: 30px; align-items: flex-end; margin: 20px 0 14px; }
-  .eq i { width: 5px; height: 100%; border-radius: 3px; background: var(--gold); transform-origin: bottom; transform: scaleY(.2); animation: eq 1s ease-in-out infinite; animation-play-state: paused; }
+  .eq { display: flex; gap: 6px; height: 24px; align-items: flex-end; margin: 12px 0 4px; }
+  .eq i { width: 5px; height: 100%; border-radius: 3px; background: var(--gold); transform-origin: bottom; transform: scaleY(.2); animation: eq .9s ease-in-out infinite; animation-play-state: paused; }
   .eq i:nth-child(2) { animation-delay: -.3s; } .eq i:nth-child(3) { animation-delay: -.6s; }
   .eq i:nth-child(4) { animation-delay: -.15s; } .eq i:nth-child(5) { animation-delay: -.45s; }
+  #song.playing .eq i { animation-duration: .6s; animation-play-state: running; }
   @keyframes eq { 0%, 100% { transform: scaleY(.2); } 50% { transform: scaleY(1); } }
-  .prog { width: min(420px, 100%); display: flex; align-items: center; gap: 12px; font-size: 16px; color: rgba(248, 241, 228, .7); font-variant-numeric: tabular-nums; }
+  .lyrics {
+    position: relative; width: min(640px, 100%); height: clamp(150px, 27vh, 220px); margin: 10px 0 6px; overflow: hidden;
+    -webkit-mask-image: linear-gradient(transparent, #000 26%, #000 74%, transparent);
+    mask-image: linear-gradient(transparent, #000 26%, #000 74%, transparent);
+  }
+  /* The lines sit in one tall column that glides upward so the sung line stays in the middle */
+  .reel { position: absolute; left: 0; right: 0; top: 0; transition: transform .8s cubic-bezier(.22, .61, .36, 1); will-change: transform; }
+  .reel p {
+    margin: 0; padding: 5px 10px; text-wrap: balance;
+    font: 700 clamp(21px, calc(3vw + 2px), 30px)/1.3 var(--serif);
+    color: rgba(248, 241, 228, .34); transform: scale(.74);
+    transition: color .6s ease, transform .8s cubic-bezier(.22, .61, .36, 1);
+  }
+  .reel p.on { color: var(--gold); transform: scale(1); }
+  .prog { width: min(460px, 100%); display: flex; align-items: center; gap: 12px; font-size: 16px; color: rgba(248, 241, 228, .7); font-variant-numeric: tabular-nums; }
   .prog .bar { flex: 1; height: 4px; border-radius: 4px; background: rgba(248, 241, 228, .18); overflow: hidden; }
   .prog .bar b { display: block; width: 0; height: 100%; background: linear-gradient(90deg, var(--gold-deep), var(--gold)); }
-  .song-actions { margin-top: 22px; display: flex; gap: 12px; flex-wrap: wrap; justify-content: center; }
-  .songbtn { padding: 10px 26px; border-radius: 12px; border: 1px solid rgba(217, 184, 115, .55); background: transparent; color: var(--gold); font: 700 18px var(--sans); cursor: pointer; touch-action: manipulation; }
-  .songbtn.main { border: 0; background: linear-gradient(180deg, #e6c98a, var(--gold-deep)); color: var(--ink); }
+  .song-actions { margin-top: 16px; display: flex; gap: 12px; flex-wrap: wrap; justify-content: center; }
+  .songbtn { padding: 9px 26px; border-radius: 12px; border: 1px solid rgba(217, 184, 115, .55); background: transparent; color: var(--gold); font: 700 18px var(--sans); cursor: pointer; touch-action: manipulation; }
+  .songbtn[hidden] { display: none; }
+  /* Round play / pause button */
+  .playbtn {
+    width: 54px; height: 54px; border-radius: 50%; display: grid; place-items: center; cursor: pointer; touch-action: manipulation;
+    border: 1.5px solid rgba(217, 184, 115, .7); color: var(--gold);
+    background: radial-gradient(circle, rgba(236, 210, 154, .16), rgba(236, 210, 154, .04));
+    box-shadow: 0 6px 18px rgba(0, 0, 0, .35);
+    transition: transform .18s var(--ease), background .2s ease, box-shadow .2s ease;
+  }
+  .playbtn:hover { background: rgba(217, 184, 115, .22); box-shadow: 0 0 0 5px rgba(217, 184, 115, .12), 0 6px 18px rgba(0, 0, 0, .35); }
+  .playbtn:active { transform: scale(.92); }
+  .playbtn:focus-visible { outline: 3px solid var(--gold); outline-offset: 4px; }
+  .playbtn svg { width: 22px; height: 22px; fill: currentColor; }
+  .playbtn .ic-play { margin-left: 2px; }
+  #song.paused .ic-pause, #song:not(.paused) .ic-play { display: none; }
+  #song.failed .playbtn { display: none; }
   .songbtn:hover { filter: brightness(1.12); }
   .songbtn:focus-visible, .songlink:focus-visible { outline: 3px solid var(--gold); outline-offset: 3px; }
-  .songlink { margin-top: 16px; font-size: 18px; color: var(--gold); }
+  .songlink { margin-top: 12px; font-size: 18px; color: var(--gold); }
   .songlink[hidden] { display: none; }
+  @media (max-height: 640px) { .eq { display: none; } .disc { width: 76px; margin: 8px 0 6px; } .lyrics { height: 120px; } }
 
   /* Player: full video always visible, scaled to fit any screen */
   #player { padding: 0; background: #000; }
@@ -335,21 +375,34 @@
   }
   .finger.show { opacity: 1; }
   .finger.tap { transform: scale(.7); background: rgba(248, 241, 228, .65); }
+  /* Tap feedback: two soft gold rings that expand and fade from the exact point of the tap */
   .ripple {
-    position: fixed; z-index: 14; width: 22px; height: 22px; margin: -11px 0 0 -11px;
-    border-radius: 50%; border: 2px solid var(--gold); opacity: 0; pointer-events: none;
+    position: fixed; left: 0; top: 0; z-index: 14; width: 36px; height: 36px; margin: -18px 0 0 -18px;
+    border-radius: 50%; border: 1.5px solid rgba(236, 210, 154, .95); box-shadow: 0 0 14px rgba(217, 184, 115, .35);
+    opacity: 0; pointer-events: none;
   }
-  .ripple.go { animation: rip .6s ease-out; }
-  @keyframes rip { from { opacity: .9; transform: scale(.4); } to { opacity: 0; transform: scale(4.5); } }
-  /* Round cursor: the same circle as the tapping finger, on every screen */
+  .ripple.burst { animation: rip .8s cubic-bezier(.2, .7, .2, 1) forwards; }
+  .ripple.r2.burst { animation-delay: .1s; border-width: 1px; }
+  @keyframes rip { from { opacity: .9; transform: scale(.3); } to { opacity: 0; transform: scale(2.8); } }
+  /* Round cursor: a fine ring with a gold centre dot, on every screen */
   .cursor {
-    position: fixed; left: 0; top: 0; z-index: 30; width: 38px; height: 38px; margin: -19px 0 0 -19px;
-    border-radius: 50%; background: rgba(248, 241, 228, .35); border: 2px solid rgba(248, 241, 228, .9);
-    box-shadow: 0 4px 14px rgba(0, 0, 0, .4); opacity: 0; pointer-events: none; will-change: translate;
-    transition: opacity .25s ease, scale .15s ease, background .15s ease;
+    position: fixed; left: 0; top: 0; z-index: 30; width: 34px; height: 34px; margin: -17px 0 0 -17px;
+    border-radius: 50%; border: 1.5px solid rgba(248, 241, 228, .85);
+    background: radial-gradient(circle, rgba(236, 210, 154, .22), rgba(236, 210, 154, .05) 70%);
+    box-shadow: 0 0 18px rgba(217, 184, 115, .28), 0 4px 14px rgba(0, 0, 0, .35);
+    opacity: 0; pointer-events: none; will-change: translate;
+    transition: opacity .25s ease, scale .18s cubic-bezier(.3, 1.4, .5, 1), background .18s ease, border-color .18s ease;
+  }
+  .cursor::after {
+    content: ""; position: absolute; left: 50%; top: 50%; width: 6px; height: 6px; margin: -3px 0 0 -3px;
+    border-radius: 50%; background: var(--gold);
   }
   .cursor.show { opacity: 1; }
-  .cursor.tap { scale: .7; background: rgba(248, 241, 228, .65); }
+  .cursor.tap { scale: .78; border-color: var(--gold); background: radial-gradient(circle, rgba(236, 210, 154, .42), rgba(236, 210, 154, .14) 70%); }
+  /* No grey or square flash when tapping on phones; keyboard focus rings are kept */
+  * { -webkit-tap-highlight-color: transparent; }
+  button, .invite, .dial, .window, .notif { -webkit-touch-callout: none; user-select: none; -webkit-user-select: none; }
+  :focus:not(:focus-visible) { outline: none; }
   @media (hover: hover) and (pointer: fine) { *, *::before, *::after { cursor: none !important; } }
   #launch {
     position: fixed; inset: 0; z-index: 20; visibility: hidden; pointer-events: none;
@@ -548,7 +601,8 @@
     .gb-lid, .gb-bow, .glow { transition-duration: .01s; }
     .bubble, .invite, .invite.ready, .typing i, .invite .art svg, .invite .tw, .composer .type.live::after, .notif, .ls-hint { animation: none; }
     .kbd-wrap { transition-duration: .01s; }
-    .disc svg, .eq i, .stage.on .song-card > * { animation: none; }
+    .disc svg, .disc::after, .eq i, .stage.on .song-card > * { animation: none; }
+    .reel, .reel p { transition-duration: .01s; }
     .ls-hint { opacity: .9; }
     #launch.go { transition-duration: .01s; }
   }
@@ -716,14 +770,18 @@
         <circle cx="60" cy="60" r="3.5" fill="#230c18"/>
       </svg>
     </div>
-    <h1 id="songTitle">A Song for Cora</h1>
+    <h1 id="songTitle">A Song for Manang Cora</h1>
     <p class="sub" id="songFrom"></p>
     <p class="songcredit" id="songCredit" hidden></p>
     <div class="eq" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i></div>
+    <div class="lyrics" id="lyrics" aria-hidden="true"><div class="reel" id="reel"></div></div>
     <div class="prog"><span id="songNow">0:00</span><div class="bar"><b id="songBar"></b></div><span id="songLen">0:00</span></div>
     <div class="song-actions">
-      <button type="button" class="songbtn main" id="songPlay" hidden>Play the song</button>
-      <button type="button" class="songbtn" id="songSkip">Skip</button>
+      <button type="button" class="playbtn" id="songToggle" aria-label="Pause the song">
+        <svg class="ic-pause" viewBox="0 0 24 24" aria-hidden="true"><rect x="6" y="5" width="4.2" height="14" rx="1.3"/><rect x="13.8" y="5" width="4.2" height="14" rx="1.3"/></svg>
+        <svg class="ic-play" viewBox="0 0 24 24" aria-hidden="true"><path d="M8 5.6v12.8a1 1 0 0 0 1.52.85l10.2-6.4a1 1 0 0 0 0-1.7L9.52 4.75A1 1 0 0 0 8 5.6z"/></svg>
+      </button>
+      <button type="button" class="songbtn" id="songContinue" hidden>Continue</button>
     </div>
     <a class="songlink" id="songLink" target="_blank" rel="noopener" hidden>Listen to your song online</a>
   </div>
@@ -752,8 +810,66 @@
 
 <script>
   // The greetings play group by group, in this order. Each group opens with a
-  // chapter card. A group with no videos yet is skipped, so the Mallabo family
-  // and the daughters can be added later by listing their files below.
+  // chapter card. A group with no videos yet is skipped.
+  const SONG_LYRICS = [  // [time in seconds, line]: each line appears exactly at its time
+    [0.82, "Manang Cora"],
+    [4.29, "Manang Cora"],
+    [7.96, "Manang Cora"],
+    [13.5, "I still remember back in my college days"],
+    [17.3, "Walking through your door after a long week of classes"],
+    [20.48, "Your house was always filled with so much noise and laughter"],
+    [23.8, "Your cute little children running across the living room floor"],
+    [27.96, "You would welcome me inside without a single complaint"],
+    [31.51, "Setting another plate at the table with that warm caring smile"],
+    [35.49, "Even back then, you were teaching everyone around you how to love"],
+    [41.64, "A patient mother holding everything together so gracefully"],
+    [47.02, "I used to sit on your couch just watching how you care for your family"],
+    [52.34, "Never showing any fatigue, just pure warmth and open arms"],
+    [57.5, "You surpass every storm that comes your way"],
+    [61.5, "Your beautiful soul guiding us day by day"],
+    [65.09, "Manang Cora"],
+    [66.5, "You shine so bright through it all"],
+    [68.87, "A patient heart that catches us whenever we fall"],
+    [72.31, "You teach us how to give love to everyone we meet"],
+    [76.2, "Making this life so wondrously sweet"],
+    [87.06, "I stand so strong"],
+    [88.51, "No matter how dark the clouds get"],
+    [90.65, "Enduring every hardship with the grace I will never forget"],
+    [93.92, "Whether teaching in the classroom or taking care of home"],
+    [97.81, "You make sure nobody around you ever feels alone"],
+    [101.42, "Supporting every single dream we dare to chase"],
+    [104.95, "Greeting every heavy trial with steady quiet grace"],
+    [108.65, "Manang Cora"],
+    [110.34, "Your spirit is a light in the dark"],
+    [116.06, "You surpass every storm that comes your way"],
+    [119.9, "Your beautiful soul guiding us day by day"],
+    [123.34, "Manang Cora"],
+    [124.89, "You shine so bright through it all"],
+    [127.06, "A patient heart that catches us whenever we fall"],
+    [130.68, "You teach us how to give love to everyone we meet"],
+    [134.9, "Making this life so wondrously sweet"],
+    [144.75, "Today on your birthday I just wanna pause and say"],
+    [148.46, "Thank you for every sacrifice you make everyday"],
+    [152.06, "May your path ahead be blessed with health and peace"],
+    [155.65, "May the joy in your warm home never ever cease"],
+    [159.65, "Manang Cora"],
+    [161.05, "Keep sharing that love that heals every heart"],
+    [165.96, "You have been our anchor right from the very start"],
+    [173.96, "You surpass every storm that comes your way"],
+    [177.81, "Your beautiful soul guiding us day by day"],
+    [181.46, "Manang Cora"],
+    [182.86, "You shine so bright through it all"],
+    [184.9, "A patient heart that catches us whenever we fall"],
+    [188.4, "You teach us how to give love to everyone we meet"],
+    [192.86, "Making this life so wondrously sweet"],
+    [202.68, "Wishing you a long, happy, and healthy life ahead"],
+    [206.62, "Keep giving love to every person whose path you touch"],
+    [210.33, "Love you always, my sister, my guide"],
+    [217.62, "Manang Cora"],
+    [218.93, "I am so proud to stand by your side"],
+    [228.05, "Happy birthday"]
+  ];
+
   const groups = [
     { name: 'Your Scholars', videos: [
       'scholarvideo1.mp4', 'scholarvideo2.mp4', 'scholarvideo3.mp4', 'scholarvideo4.mp4', 'scholarvideo5.mp4',
@@ -762,37 +878,36 @@
     { name: 'Your Former Colleagues at Miriam College', videos: [
       'miriamvideo1.mp4', 'miriamvideo2.mp4', 'miriamvideo3.mp4', 'miriamvideo4.mp4'
     ]},
-    { name: 'The Mallabo Family', videos: [
-      // add the Mallabo family videos here, for example 'mallabovideo1.mp4'
-      // their personalised song plays after any videos; download it and save it as mallabo-song.mp3
-      { song: 'mallabo-song.mp3', title: 'A Song for Cora', from: 'A gift from the Mallabo Family', credit: 'Lovingly prepared by Delia Rica M. Flores',
-        link: 'https://foreversongs.com/en-PH/song/t/187a6ce059ac05a76310caa72cc0452fa700f82ec8076d537c5c3064ca5857ee' }
-    ]},
     { name: 'The Alvarez Family', videos: [
-      'video19.mp4', // longest, heartfelt message
       'video17.mp4', // two elder ladies, warm opening wishes
+      'video16.mp4', // elder couple
       'video14.mp4', // uncle, cheerful greeting
       'video12.mp4', // short, sincere message
       'video20.mp4', // new clip, plays right before the longest message
+      'video19.mp4', // longest, heartfelt message
       'video15.mp4', // couple on the sofa
       'video18.mp4', // couple in the car
       'video13.mp4', // playground, waving with the dog
-      'video11.mp4',  // the kids
-      'video16.mp4' // elder couple
+      'video11.mp4'  // the kids
     ]},
-    { name: 'Your Daughters and Son', videos: [
-      'sonvideo2.mp4',
+    // The song prepared by Delia plays after the Alvarez family, before the final family messages.
+    // Save the song as mallabo-song.mp3 next to this file. It has no chapter card of its own.
+    { name: 'Song by Delia', noChapter: true, videos: [
+      { song: 'mallabo-song.mp3', title: 'A Song for Manang Cora', credit: 'Lovingly prepared by Delia Rica M. Flores',
+        lyrics: SONG_LYRICS, bursts: [1, 57.5, 116.06, 173.96, 228.05], pauseAfter: 4000, // milliseconds of silence after the song
+        link: 'https://foreversongs.com/en-PH/song/t/187a6ce059ac05a76310caa72cc0452fa700f82ec8076d537c5c3064ca5857ee' }
+    ]},
+    { name: 'The Family You Have Built', videos: [
       'daughtervideo1.mp4',
-      'daughtervideo3part1.mp4', 'daughtervideo3part2.mp4', 'daughtervideo3part3.mp4', // daughter 3, in three parts
-      'sonvideo1.mp4'
-      
+      'sonvideo1.mp4', 'sonvideo2.mp4', // the son's messages sit in the middle of the daughters
+      'daughtervideo3part1.mp4', 'daughtervideo3part2.mp4', 'daughtervideo3part3.mp4' // daughter 3, in three parts
     ]}
   ].filter(g => g.videos.length);
 
   const videoList = groups.flatMap(g => g.videos);
   const chapterAt = {}; // clip number -> the group that starts there
   let n = 0;
-  groups.forEach(g => { chapterAt[n] = g; n += g.videos.length; });
+  groups.forEach(g => { if (!g.noChapter) chapterAt[n] = g; n += g.videos.length; });
 
   const INTRO_MS = 6000;
   const CHAPTER_MS = 4500;
@@ -851,13 +966,64 @@
     old.load();
   }
 
-  // ---------- A personalised song ----------
-  // A group can include a song as { song: 'file.mp3', title, from, link }. It plays on
-  // its own card, the background music rests while it plays, and the show carries on
-  // when it ends. Skip is always available.
+  // ---------- The opening song ----------
+  // A group can include a song as { song: 'file.mp3', title, from, credit, link, lyrics, bursts }.
+  // It plays on its own card with the lyrics in time, the background music rests while
+  // it plays, and the show carries on when it ends. A round button pauses and resumes it.
   const songAudio = $('songAudio'), songEl = $('song');
-  let songFinish = null;
+  const LYRIC_LEAD = 0;  // seconds: 0 follows the times in the lyrics file exactly; raise it to show every line a little earlier
+  let songFinish = null, lyr = [], lyrIdx = -2, bursts = [], burstIdx = 0, syncRaf = 0;
   const fmt = t => isFinite(t) ? Math.floor(t / 60) + ':' + String(Math.floor(t % 60)).padStart(2, '0') : '0:00';
+
+  // The lyrics file gives the exact second each line starts, so every line is shown at its own
+  // time. Where a long instrumental gap follows a line, a music note fills it once the line
+  // has been sung (estimated from its syllables), so the last words do not linger over the music.
+  function buildLyrics(items) {
+    const syllables = w => {
+      w = w.toLowerCase().replace(/[^a-z]/g, '');
+      if (!w) return 0;
+      let n = (w.match(/[aeiouy]+/g) || []).length;
+      if (w.length > 2 && w.endsWith('e') && !w.endsWith('le')) n--;
+      return Math.max(1, n);
+    };
+    const sung = text => text.split(/\s+/).reduce((n, w) => n + syllables(w), 0) * 0.32 + 0.6;  // seconds
+    const NOTE = '\u266A \u266A \u266A';
+    const out = [];
+    items.forEach(([t, text], i) => {
+      out.push({ t, text });
+      const end = t + sung(text), next = items[i + 1];
+      if (!next || next[0] - end > 3.5) out.push({ t: end, text: NOTE });
+    });
+    return out;
+  }
+
+  // All lines live in one column (the first row is a note for the instrumental intro).
+  // The column slides up smoothly so the line being sung stays in the middle.
+  const reel = $('reel'), lyricBox = $('lyrics');
+  function buildReel() {
+    reel.textContent = '';
+    ['\u266A \u266A \u266A', ...lyr.map(l => l.text)].forEach(t => {
+      const p = document.createElement('p'); p.textContent = t; reel.appendChild(p);
+    });
+  }
+  function centerLyric(smooth) {
+    const row = reel.children[lyrIdx + 1];
+    if (!row) return;
+    reel.style.transition = smooth ? '' : 'none';
+    reel.style.transform = 'translateY(' + (lyricBox.clientHeight / 2 - (row.offsetTop + row.offsetHeight / 2)) + 'px)';
+    if (!smooth) { void reel.offsetWidth; reel.style.transition = ''; }
+  }
+  function showLyric(i) {
+    if (i === lyrIdx) return;
+    const first = lyrIdx < -1;
+    const old = reel.children[lyrIdx + 1];
+    if (old) old.classList.remove('on');
+    lyrIdx = i;
+    const row = reel.children[i + 1];
+    if (row) row.classList.add('on');
+    centerLyric(!first);
+  }
+  window.addEventListener('resize', () => { if (lyrIdx >= -1) centerLyric(false); });
 
   async function playSong(item) {
     clearVideo();
@@ -865,44 +1031,70 @@
     $('songFrom').textContent = item.from || '';
     $('songCredit').textContent = item.credit || ''; $('songCredit').hidden = !item.credit;
     songEl.classList.remove('playing', 'failed');
-    $('songPlay').hidden = true; $('songLink').hidden = true;
-    $('songSkip').textContent = 'Skip';
+    $('songLink').hidden = true; $('songContinue').hidden = true;
+    songEl.classList.remove('paused'); setToggleLabel();
     $('songBar').style.width = '0'; $('songNow').textContent = '0:00'; $('songLen').textContent = '0:00';
     if (item.link) $('songLink').href = item.link;
+    lyr = item.lyrics ? buildLyrics(item.lyrics) : []; lyrIdx = -2;
+    $('lyrics').hidden = !lyr.length;
+    if (lyr.length) { buildReel(); showLyric(-1); }
+    bursts = item.bursts || []; burstIdx = 0;
+    const after = index + 1;                       // warm up the first clip that follows the song
+    if (typeof videoList[after] === 'string') loadInto(vids[1 - cur], after);
     let done = false;
-    songFinish = () => {
+    songFinish = async () => {
       if (done) return;
       done = true; songFinish = null;
       songAudio.pause();
+      // A quiet moment after the lively song: the card fades away and the screen rests in the
+      // dark, with no music, before the softer part begins
+      show('none');
+      await wait(item.pauseAfter ?? 4000);
       next();
     };
     setMusic(0, 1.2);
+    setTimeout(() => { if (level === 0 && songFinish) { music.pause(); musicStarted = false; } }, 1500);  // rests completely
     songAudio.src = item.song;
     songAudio.load();
     show('song');
     try { await songAudio.play(); }
     catch {
       await wait(400);
-      if (!songEl.classList.contains('failed')) $('songPlay').hidden = false; // the browser wants a tap first
+      if (!songEl.classList.contains('failed')) { songEl.classList.add('paused'); setToggleLabel(); } // the browser wants a tap first
     }
   }
-  songAudio.addEventListener('playing', () => { songEl.classList.add('playing'); $('songPlay').hidden = true; });
-  songAudio.addEventListener('pause', () => songEl.classList.remove('playing'));
+  const setToggleLabel = () => $('songToggle').setAttribute('aria-label', songEl.classList.contains('paused') ? 'Play the song' : 'Pause the song');
+  songAudio.addEventListener('playing', () => { songEl.classList.add('playing'); songEl.classList.remove('paused'); setToggleLabel(); });
+  songAudio.addEventListener('pause', () => { songEl.classList.remove('playing'); songEl.classList.add('paused'); setToggleLabel(); });
   songAudio.addEventListener('loadedmetadata', () => { $('songLen').textContent = fmt(songAudio.duration); });
-  songAudio.addEventListener('timeupdate', () => {
-    $('songNow').textContent = fmt(songAudio.currentTime);
-    if (songAudio.duration) $('songBar').style.width = (songAudio.currentTime / songAudio.duration * 100) + '%';
-  });
+  // Keeps the time, progress bar, lyrics and bursts in step with the song. It runs on every
+  // screen frame while the song plays (the audio's own timeupdate only fires about 4 times
+  // a second, which made the lyrics feel late) and on timeupdate as a backup.
+  function syncSong() {
+    const t = songAudio.currentTime;
+    $('songNow').textContent = fmt(t);
+    if (songAudio.duration) $('songBar').style.width = (t / songAudio.duration * 100) + '%';
+    const ahead = t + LYRIC_LEAD;
+    if (lyr.length) { let i = -1; while (i + 1 < lyr.length && lyr[i + 1].t <= ahead) i++; showLyric(i); }
+    while (burstIdx < bursts.length && ahead >= bursts[burstIdx]) {   // a golden burst on the big moments
+      burstIdx++;
+      if (songFinish) confetti(songEl.querySelector('.disc'));
+    }
+  }
+  const syncLoop = () => { syncSong(); syncRaf = requestAnimationFrame(syncLoop); };
+  songAudio.addEventListener('timeupdate', syncSong);
+  songAudio.addEventListener('playing', () => { cancelAnimationFrame(syncRaf); syncLoop(); });
+  ['pause', 'ended', 'error'].forEach(ev => songAudio.addEventListener(ev, () => cancelAnimationFrame(syncRaf)));
   songAudio.addEventListener('ended', () => { if (songFinish) songFinish(); });
   songAudio.addEventListener('error', () => {   // file missing: offer the online link and a way to continue
     if (!songFinish) return;
     songEl.classList.add('failed');
-    $('songPlay').hidden = true;
     $('songLink').hidden = !$('songLink').getAttribute('href');
-    $('songSkip').textContent = 'Continue';
+    $('songContinue').hidden = false;
   });
-  $('songSkip').addEventListener('click', () => { if (songFinish) songFinish(); });
-  $('songPlay').addEventListener('click', () => songAudio.play().catch(() => {}));
+  $('songContinue').addEventListener('click', () => { if (songFinish) songFinish(); });
+  // One round button pauses and resumes the song
+  $('songToggle').addEventListener('click', () => { if (songAudio.paused) songAudio.play().catch(() => {}); else songAudio.pause(); });
 
   // Shows the chapter card when a new group begins, then plays the clip
   async function beginClip() {
@@ -930,8 +1122,9 @@
   }
 
   // ---------- Background music ----------
-  // Plays from the moment the gate opens and never stops: full volume for the
-  // intro and closing and on each chapter card, and softly under the video messages.
+  // The track starts when the gate opens, rests softly under the video messages and rises on each
+  // chapter card. It fades out completely for Delia's song, so the lively song is never mixed with
+  // it, and begins again from the top after the quiet pause that follows the song.
   const music = $('music'), musicBtn = $('musicBtn');
   const LEVEL = { full: 0.55, gap: 0.3, duck: 0.1 };
   // Video loudness: browsers cap a video's own volume at 100%, so a Web Audio
@@ -969,7 +1162,20 @@
       }, 33);
     }
   }
-  function setMusic(l, sec) { level = l; if (musicOk) applyLevel(sec); }
+  // The track really begins only when it is first asked to be audible, from the beginning
+  let musicStarted = false;
+  function beginMusic() {
+    if (musicStarted || !musicOk) return;
+    musicStarted = true;
+    music.currentTime = 0;
+    music.play().then(() => { musicBtn.hidden = false; })
+                .catch(() => { musicStarted = false; });
+  }
+  function setMusic(l, sec) {
+    level = l;
+    if (l > 0) beginMusic();
+    if (musicOk) applyLevel(sec);
+  }
 
   function startMusic() {
     const AC = window.AudioContext || window.webkitAudioContext;
@@ -991,8 +1197,7 @@
     }
     if (ctx && ctx.state === 'suspended') ctx.resume();
     if (!gain) music.volume = 0;
-    music.play().then(() => { musicBtn.hidden = false; setMusic(LEVEL.full, 2.5); })
-                .catch(() => { musicOk = false; });
+    setMusic(LEVEL.full, 2.5);    // the tap is a fresh gesture, so the track may start now
   }
 
   music.addEventListener('error', () => { musicOk = false; musicBtn.hidden = true; }); // no song file? carry on silently
@@ -1045,6 +1250,20 @@
 
   // Tiny sound effects (only after the person has tapped something)
   let sfx = null;
+  // Every sound effect goes through one shared output with a boost and a limiter, so effects
+  // are clearly audible but never distort. Raise SFX_VOLUME for louder, lower it for softer.
+  const SFX_VOLUME = 3;
+  let sfxBusNode = null;
+  function sfxBus() {
+    if (!sfxBusNode) {
+      const g = sfx.createGain(); g.gain.value = SFX_VOLUME;
+      const lim = sfx.createDynamicsCompressor();
+      lim.threshold.value = -10; lim.knee.value = 8; lim.ratio.value = 12; lim.attack.value = 0.002; lim.release.value = 0.15;
+      g.connect(lim).connect(sfx.destination);
+      sfxBusNode = g;
+    }
+    return sfxBusNode;
+  }
   function blip(freq, dur, vol, delay = 0) {
     try {
       const AC = window.AudioContext || window.webkitAudioContext;
@@ -1055,7 +1274,7 @@
       g.gain.setValueAtTime(0.0001, t);
       g.gain.exponentialRampToValueAtTime(vol, t + 0.006);
       g.gain.exponentialRampToValueAtTime(0.0001, t + dur);
-      o.connect(g).connect(sfx.destination);
+      o.connect(g).connect(sfxBus());
       o.start(t); o.stop(t + dur + 0.03);
     } catch { /* sound is optional */ }
   }
@@ -1166,13 +1385,13 @@
   });
 
   // Gold confetti burst from the lock
-  function confetti() {
+  function confetti(from = lockWrap) {
     if (matchMedia('(prefers-reduced-motion: reduce)').matches) return;
     const cv = $('confetti'), c = cv.getContext('2d'), dpr = window.devicePixelRatio || 1;
     const W = window.innerWidth, H = window.innerHeight;
     cv.width = W * dpr; cv.height = H * dpr; c.setTransform(dpr, 0, 0, dpr, 0, 0);
     const colors = ['#d9b873', '#ecd29a', '#f8f1e4', '#f2a79f', '#b48f4b'];
-    const r = lockWrap.getBoundingClientRect(), ox = r.left + r.width / 2, oy = r.top + r.height * 0.55;
+    const r = from.getBoundingClientRect(), ox = r.left + r.width / 2, oy = r.top + r.height * 0.55;
     const ps = Array.from({ length: 120 }, () => ({
       x: ox, y: oy, vx: (Math.random() - .5) * 15, vy: -Math.random() * 13 - 4,
       w: 6 + Math.random() * 6, h: 3 + Math.random() * 5,
@@ -1221,15 +1440,16 @@
   goBtn.addEventListener('pointerdown', e => { if (!unlocked && !allOk()) { e.preventDefault(); wrong(); dodge(); } });
 
   // ---------- Tap feedback everywhere ----------
-  // Every real tap or click shows the same finger and gold ripple used when the
-  // invitation is tapped in the chat, so the cursor feels the same on every screen.
+  // Every real tap or click shows the same gold ripple, so it feels the same on every screen.
   function tapFx(x, y) {
     if (matchMedia('(prefers-reduced-motion: reduce)').matches) return;
-    const rp = document.createElement('div');
-    rp.className = 'ripple go';
-    rp.style.left = x + 'px'; rp.style.top = y + 'px';
-    document.body.append(rp);
-    rp.addEventListener('animationend', () => rp.remove());
+    ['', ' r2'].forEach(extra => {
+      const rp = document.createElement('div');
+      rp.className = 'ripple burst' + extra;   // not 'go': that name belongs to the Open button
+      rp.style.left = x + 'px'; rp.style.top = y + 'px';
+      document.body.append(rp);
+      rp.addEventListener('animationend', () => rp.remove());
+    });
   }
 
   // The round cursor follows the mouse (or a finger) everywhere, shrinks on press,
@@ -1365,7 +1585,7 @@
       g.gain.setValueAtTime(0.0001, t + d);
       g.gain.exponentialRampToValueAtTime(0.14, t + d + 0.012);
       g.gain.exponentialRampToValueAtTime(0.0001, t + d + 0.5);
-      o.connect(g).connect(sfx.destination);
+      o.connect(g).connect(sfxBus());
       o.start(t + d); o.stop(t + d + 0.55);
     });
   }
@@ -1384,7 +1604,7 @@
     g.gain.setValueAtTime(0.0001, t);
     g.gain.exponentialRampToValueAtTime(space ? 0.16 : 0.12, t + 0.003);
     g.gain.exponentialRampToValueAtTime(0.0001, t + 0.045);
-    src.connect(f).connect(g).connect(sfx.destination);
+    src.connect(f).connect(g).connect(sfxBus());
     src.start(t); src.stop(t + 0.05);
   }
   // Send: a quick soft rising blip
@@ -1395,7 +1615,7 @@
     g.gain.setValueAtTime(0.0001, t);
     g.gain.exponentialRampToValueAtTime(0.1, t + 0.01);
     g.gain.exponentialRampToValueAtTime(0.0001, t + 0.16);
-    o.connect(g).connect(sfx.destination);
+    o.connect(g).connect(sfxBus());
     o.start(t); o.stop(t + 0.2);
   }
 
@@ -1417,7 +1637,7 @@
     g.gain.setValueAtTime(0.0001, t);
     g.gain.exponentialRampToValueAtTime(vol, t + 0.01);
     g.gain.exponentialRampToValueAtTime(0.0001, t + dur);
-    o.connect(g).connect(sfx.destination);
+    o.connect(g).connect(sfxBus());
     o.start(t); o.stop(t + dur + 0.05);
   }
   let fxNoise = null;
@@ -1433,7 +1653,7 @@
     g.gain.setValueAtTime(0.0001, t);
     g.gain.exponentialRampToValueAtTime(vol, t + Math.min(0.02, dur / 3));
     g.gain.exponentialRampToValueAtTime(0.0001, t + dur);
-    src.connect(f).connect(g).connect(sfx.destination);
+    src.connect(f).connect(g).connect(sfxBus());
     src.start(t); src.stop(t + dur + 0.02);
   }
 
@@ -1580,7 +1800,7 @@
     await beat(1050);
     finger.classList.add('tap'); invite.classList.add('pressed');
     ripple.style.left = tx + 'px'; ripple.style.top = ty + 'px';
-    ripple.classList.remove('go'); void ripple.offsetWidth; ripple.classList.add('go');
+    ripple.classList.remove('burst'); void ripple.offsetWidth; ripple.classList.add('burst');
     await beat(380);
   }
 
@@ -1641,7 +1861,7 @@
     $('lsTime').textContent = now.toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' }).replace(/\s?[AP]M/i, '');
     $('lsDate').textContent = now.toLocaleDateString([], { weekday: 'long', month: 'long', day: 'numeric' });
     show('lock');
-    await wait(5000);             // a calm moment on the lock screen, then the message arrives
+    await wait(10000);            // a calm moment on the lock screen, then the message arrives
     if (chatOpened) return;
     $('notif').hidden = false; $('lsHint').hidden = false;
     notifTone();
