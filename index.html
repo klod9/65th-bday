@@ -95,7 +95,7 @@
   #outro .rule { margin: clamp(28px, 5vh, 48px) auto; }
   #outro .body {
     max-width: 68ch;
-    font-size: clamp(20px, calc(1.9vw + 2px), 26px);
+    font-size: clamp(22px, calc(1.9vw + 4px), 28px);
     line-height: 1.8;
     text-wrap: balance;
   }
@@ -152,8 +152,6 @@
   .prog .bar { flex: 1; height: 4px; border-radius: 4px; background: rgba(248, 241, 228, .18); overflow: hidden; }
   .prog .bar b { display: block; width: 0; height: 100%; background: linear-gradient(90deg, var(--gold-deep), var(--gold)); }
   .song-actions { margin-top: 16px; display: flex; gap: 12px; flex-wrap: wrap; justify-content: center; }
-  .songbtn { padding: 9px 26px; border-radius: 12px; border: 1px solid rgba(217, 184, 115, .55); background: transparent; color: var(--gold); font: 700 18px var(--sans); cursor: pointer; touch-action: manipulation; }
-  .songbtn[hidden] { display: none; }
   /* Round play / pause button */
   .playbtn {
     width: 54px; height: 54px; border-radius: 50%; display: grid; place-items: center; cursor: pointer; touch-action: manipulation;
@@ -168,11 +166,6 @@
   .playbtn svg { width: 22px; height: 22px; fill: currentColor; }
   .playbtn .ic-play { margin-left: 2px; }
   #song.paused .ic-pause, #song:not(.paused) .ic-play { display: none; }
-  #song.failed .playbtn { display: none; }
-  .songbtn:hover { filter: brightness(1.12); }
-  .songbtn:focus-visible, .songlink:focus-visible { outline: 3px solid var(--gold); outline-offset: 3px; }
-  .songlink { margin-top: 12px; font-size: 18px; color: var(--gold); }
-  .songlink[hidden] { display: none; }
   @media (max-height: 640px) { .eq { display: none; } .disc { width: 76px; margin: 8px 0 6px; } .lyrics { height: 120px; } }
 
   /* Player: full video always visible, scaled to fit any screen */
@@ -219,9 +212,6 @@
     1.786%, 8.929%, 16.071%, 23.214% { transform: rotate(-2deg) translateX(-1.5px); }
     5.357%, 12.5%, 19.643%, 26.786% { transform: rotate(2deg) translateX(1.5px); }
   }
-  .ls-hint { margin-top: 18px; font-size: 18px; color: var(--gold); opacity: 0; animation: hintIn .6s ease 1.2s forwards; }
-  .ls-hint[hidden] { display: none; }
-  @keyframes hintIn { to { opacity: .9; } }
 
   /* ---------- Opening: a private message with the invitation ---------- */
   #chat { padding: clamp(0px, 3vw, 28px); }
@@ -446,7 +436,6 @@
   .giftbox .spark { top: 40%; }
   .giftbox.open .spark { animation: burst 1s var(--ease) .1s both; }
   .welcome-title { font: 700 clamp(30px, calc(5.4vw + 2px), 44px)/1.2 var(--serif); color: var(--ivory); transition: opacity .25s ease; }
-  .welcome-sub { margin-top: 6px; font-size: clamp(20px, calc(2.4vw + 2px), 24px); color: rgba(248, 241, 228, .8); transition: opacity .25s ease; }
 
   /* ---------- Password gate: date dials ---------- */
   #gate .gate-card {
@@ -492,7 +481,6 @@
   }
 
   .gate-title { font: 700 clamp(28px, calc(5vw + 2px), 38px)/1.2 var(--serif); margin-top: 6px; color: var(--ivory); }
-  .gate-sub { font-size: 21px; margin-top: 4px; color: rgba(248, 241, 228, .8); }
 
   /* A hint that the password is her date of birth */
   .hint-card {
@@ -545,7 +533,6 @@
   .val.down { animation: rollDown .22s var(--ease); }
   @keyframes rollUp { from { transform: translateY(70%); opacity: 0; } to { transform: none; opacity: 1; } }
   @keyframes rollDown { from { transform: translateY(-70%); opacity: 0; } to { transform: none; opacity: 1; } }
-  .how { margin-top: 12px; font-size: 17px; color: rgba(248, 241, 228, .65); }
 
   .actions { margin-top: 18px; }
   .go {
@@ -568,7 +555,6 @@
   @media (max-height: 700px) {
     .lock-wrap { width: 84px; height: 98px; }
     .hint-card { margin: 12px auto; }
-    .how { display: none; }
   }
 
   /* Music on/off, shown after the gate opens */
@@ -599,11 +585,10 @@
     .val.up, .val.down, .go.ready { animation: none; }
     .stage.on .welcome-card > *, .stage.on .welcome-card > .giftbox, .giftbox.shake .gift-svg, .giftbox.open .spark { animation: none; }
     .gb-lid, .gb-bow, .glow { transition-duration: .01s; }
-    .bubble, .invite, .invite.ready, .typing i, .invite .art svg, .invite .tw, .composer .type.live::after, .notif, .ls-hint { animation: none; }
+    .bubble, .invite, .invite.ready, .typing i, .invite .art svg, .invite .tw, .composer .type.live::after, .notif { animation: none; }
     .kbd-wrap { transition-duration: .01s; }
     .disc svg, .disc::after, .eq i, .stage.on .song-card > * { animation: none; }
     .reel, .reel p { transition-duration: .01s; }
-    .ls-hint { opacity: .9; }
     #launch.go { transition-duration: .01s; }
   }
 </style>
@@ -622,7 +607,6 @@
       <span class="ntext"><strong>Your Loved Ones</strong><span>Sent you a message</span></span>
       <em>now</em>
     </button>
-    <p class="ls-hint" id="lsHint" hidden>Tap the message to open it</p>
   </div>
 </section>
 
@@ -678,7 +662,6 @@
       <span class="spark" style="--dx:90px;--dy:-100px"></span>
     </div>
     <h2 class="welcome-title" id="wTitle">Your surprise has arrived</h2>
-    <p class="welcome-sub" id="wSub">Let us unwrap it for you.</p>
   </div>
 </section>
 
@@ -703,7 +686,6 @@
     </div>
 
     <h2 class="gate-title">Only you can open this</h2>
-    <p class="gate-sub">Set the dials to a very special date.</p>
 
     <div class="hint-card">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3.2c-.9 1.1-.9 2 0 2.8.9-.8.9-1.7 0-2.8z"/><path d="M12 7v3.2"/><rect x="5" y="10.2" width="14" height="5.6" rx="1.6"/><path d="M4 21h16"/><path d="M6 15.8V21M18 15.8V21"/><path d="M5.2 13.2c1.2 1.1 2.1 1.1 3.3 0s2.1-1.1 3.3 0 2.1 1.1 3.3 0 2.1-1.1 3.3 0"/></svg>
@@ -730,7 +712,6 @@
         <button type="button" class="step down" tabindex="-1" aria-label="Previous year"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg></button>
       </div>
     </div>
-    <p class="how">Tap the arrows, swipe, or scroll each dial.</p>
 
     <div class="actions"><button type="button" class="go" id="go">Open</button></div>
     <p class="msg" id="msg" role="status" aria-live="polite"></p>
@@ -781,9 +762,7 @@
         <svg class="ic-pause" viewBox="0 0 24 24" aria-hidden="true"><rect x="6" y="5" width="4.2" height="14" rx="1.3"/><rect x="13.8" y="5" width="4.2" height="14" rx="1.3"/></svg>
         <svg class="ic-play" viewBox="0 0 24 24" aria-hidden="true"><path d="M8 5.6v12.8a1 1 0 0 0 1.52.85l10.2-6.4a1 1 0 0 0 0-1.7L9.52 4.75A1 1 0 0 0 8 5.6z"/></svg>
       </button>
-      <button type="button" class="songbtn" id="songContinue" hidden>Continue</button>
     </div>
-    <a class="songlink" id="songLink" target="_blank" rel="noopener" hidden>Listen to your song online</a>
   </div>
 </section>
 <audio id="songAudio" preload="auto"></audio>
@@ -872,8 +851,8 @@
 
   const groups = [
     { name: 'Your Scholars', videos: [
-      'scholarvideo1.mp4', 'scholarvideo2.mp4', 'scholarvideo3.mp4', 'scholarvideo4.mp4', 'scholarvideo5.mp4',
-      'scholarvideo6.mp4', 'scholarvideo7.mp4'
+      'scholarvideo1.mp4', 'scholarvideo2.mp4', 'scholarvideo8.mp4', 'scholarvideo3.mp4', 'scholarvideo4.mp4',
+      'scholarvideo5.mp4', 'scholarvideo6.mp4', 'scholarvideo7.mp4'
     ]},
     { name: 'Your Former Colleagues at Miriam College', videos: [
       'miriamvideo1.mp4', 'miriamvideo2.mp4', 'miriamvideo3.mp4', 'miriamvideo4.mp4'
@@ -890,16 +869,19 @@
       'video13.mp4', // playground, waving with the dog
       'video11.mp4'  // the kids
     ]},
-    // The song prepared by Delia plays after the Alvarez family, before the final family messages.
-    // Save the song as mallabo-song.mp3 next to this file. It has no chapter card of its own.
-    { name: 'Song by Delia', noChapter: true, videos: [
+    // The Mallabo family's video comes next, then the song prepared by Delia, before the final family messages.
+    { name: 'The Mallabo Family', videos: [
+      'mallabovideo1.mp4'
+    ]},
+    // The song prepared by Delia plays after the Mallabo family's video.
+    // Save the song as mallabo-song.mp3 next to this file. It opens with a chapter card like the others.
+    { name: 'Delia Rica M. Flores', kicker: 'A song prepared by', videos: [
       { song: 'mallabo-song.mp3', title: 'A Song for Manang Cora', credit: 'Lovingly prepared by Delia Rica M. Flores',
-        lyrics: SONG_LYRICS, bursts: [1, 57.5, 116.06, 173.96, 228.05], pauseAfter: 4000, // milliseconds of silence after the song
-        link: 'https://foreversongs.com/en-PH/song/t/187a6ce059ac05a76310caa72cc0452fa700f82ec8076d537c5c3064ca5857ee' }
+        lyrics: SONG_LYRICS, bursts: [1, 57.5, 116.06, 173.96, 228.05], pauseAfter: 4000, }  // pauseAfter: milliseconds of silence after the song
     ]},
     { name: 'The Family You Have Built', videos: [
       'daughtervideo1.mp4',
-      'sonvideo1.mp4', 'sonvideo2.mp4', // the son's messages sit in the middle of the daughters
+      'sonvideo1.mp4', 'sonvideo2.mp4', 'sonvideo3.mp4', // the son's messages sit in the middle of the daughters
       'daughtervideo3part1.mp4', 'daughtervideo3part2.mp4', 'daughtervideo3part3.mp4' // daughter 3, in three parts
     ]}
   ].filter(g => g.videos.length);
@@ -972,7 +954,7 @@
   // it plays, and the show carries on when it ends. A round button pauses and resumes it.
   const songAudio = $('songAudio'), songEl = $('song');
   const LYRIC_LEAD = 0;  // seconds: 0 follows the times in the lyrics file exactly; raise it to show every line a little earlier
-  let songFinish = null, lyr = [], lyrIdx = -2, bursts = [], burstIdx = 0, syncRaf = 0;
+  let songFailTimer = 0, songFinish = null, lyr = [], lyrIdx = -2, bursts = [], burstIdx = 0, syncRaf = 0;
   const fmt = t => isFinite(t) ? Math.floor(t / 60) + ':' + String(Math.floor(t % 60)).padStart(2, '0') : '0:00';
 
   // The lyrics file gives the exact second each line starts, so every line is shown at its own
@@ -1031,10 +1013,9 @@
     $('songFrom').textContent = item.from || '';
     $('songCredit').textContent = item.credit || ''; $('songCredit').hidden = !item.credit;
     songEl.classList.remove('playing', 'failed');
-    $('songLink').hidden = true; $('songContinue').hidden = true;
+    clearTimeout(songFailTimer);
     songEl.classList.remove('paused'); setToggleLabel();
     $('songBar').style.width = '0'; $('songNow').textContent = '0:00'; $('songLen').textContent = '0:00';
-    if (item.link) $('songLink').href = item.link;
     lyr = item.lyrics ? buildLyrics(item.lyrics) : []; lyrIdx = -2;
     $('lyrics').hidden = !lyr.length;
     if (lyr.length) { buildReel(); showLyric(-1); }
@@ -1045,6 +1026,7 @@
     songFinish = async () => {
       if (done) return;
       done = true; songFinish = null;
+      clearTimeout(songFailTimer);
       songAudio.pause();
       // A quiet moment after the lively song: the card fades away and the screen rests in the
       // dark, with no music, before the softer part begins
@@ -1064,7 +1046,7 @@
     }
   }
   const setToggleLabel = () => $('songToggle').setAttribute('aria-label', songEl.classList.contains('paused') ? 'Play the song' : 'Pause the song');
-  songAudio.addEventListener('playing', () => { songEl.classList.add('playing'); songEl.classList.remove('paused'); setToggleLabel(); });
+  songAudio.addEventListener('playing', () => { clearTimeout(songFailTimer); songEl.classList.add('playing'); songEl.classList.remove('paused', 'failed'); setToggleLabel(); });
   songAudio.addEventListener('pause', () => { songEl.classList.remove('playing'); songEl.classList.add('paused'); setToggleLabel(); });
   songAudio.addEventListener('loadedmetadata', () => { $('songLen').textContent = fmt(songAudio.duration); });
   // Keeps the time, progress bar, lyrics and bursts in step with the song. It runs on every
@@ -1086,20 +1068,31 @@
   songAudio.addEventListener('playing', () => { cancelAnimationFrame(syncRaf); syncLoop(); });
   ['pause', 'ended', 'error'].forEach(ev => songAudio.addEventListener(ev, () => cancelAnimationFrame(syncRaf)));
   songAudio.addEventListener('ended', () => { if (songFinish) songFinish(); });
-  songAudio.addEventListener('error', () => {   // file missing: offer the online link and a way to continue
+  // If the song file cannot be loaded the button shows play, and tapping it tries again. The
+  // show carries on by itself after 10 seconds so a viewer is never left waiting.
+  songAudio.addEventListener('error', () => {
     if (!songFinish) return;
-    songEl.classList.add('failed');
-    $('songLink').hidden = !$('songLink').getAttribute('href');
-    $('songContinue').hidden = false;
+    console.warn('The song file could not be loaded:', songAudio.currentSrc || songAudio.src);
+    songEl.classList.add('failed', 'paused'); songEl.classList.remove('playing'); setToggleLabel();
+    clearTimeout(songFailTimer);
+    songFailTimer = setTimeout(() => { if (songFinish) songFinish(); }, 10000);
   });
-  $('songContinue').addEventListener('click', () => { if (songFinish) songFinish(); });
   // One round button pauses and resumes the song
-  $('songToggle').addEventListener('click', () => { if (songAudio.paused) songAudio.play().catch(() => {}); else songAudio.pause(); });
+  $('songToggle').addEventListener('click', () => {
+    if (songEl.classList.contains('failed')) {
+      clearTimeout(songFailTimer);
+      songEl.classList.remove('failed');
+      songAudio.load();
+      songAudio.play().catch(() => {});
+    } else if (songAudio.paused) songAudio.play().catch(() => {});
+    else songAudio.pause();
+  });
 
   // Shows the chapter card when a new group begins, then plays the clip
   async function beginClip() {
     const g = chapterAt[index];
     if (g) {
+      $('chKicker').textContent = g.kicker || 'With love from';
       $('chName').textContent = g.name;
       setMusic(LEVEL.full, 1.5);
       show('chapter');
@@ -1108,8 +1101,10 @@
       const idle = vids[1 - cur];
       if (typeof videoList[index] === 'string' && idle.dataset.clip !== String(index)) loadInto(idle, index); // loads while the card is showing
       await wait(CHAPTER_MS - 1600);
-      show('player');
-      await wait(600); // the clip starts as the screen fades in, with music covering the change
+      if (typeof videoList[index] === 'string') {   // a song fades in on its own card instead
+        show('player');
+        await wait(600); // the clip starts as the screen fades in, with music covering the change
+      }
     }
     return playCurrent();
   }
@@ -1134,9 +1129,9 @@
   const VIDEO_BOOST = 2.5;
   const CLIP_GAIN = {
     'scholarvideo1.mp4': 1, 'scholarvideo2.mp4': 1, 'scholarvideo3.mp4': 1, 'scholarvideo4.mp4': 1, 'scholarvideo5.mp4': 1,
-    'scholarvideo6.mp4': 1, 'scholarvideo7.mp4': 1,
+    'scholarvideo6.mp4': 1, 'scholarvideo7.mp4': 1, 'scholarvideo8.mp4': 1, 'mallabovideo1.mp4': 1,
     'miriamvideo1.mp4': 1, 'miriamvideo2.mp4': 1, 'miriamvideo3.mp4': 1, 'miriamvideo4.mp4': 1,
-    'daughtervideo1.mp4': 1, 'daughtervideo3part1.mp4': 1, 'daughtervideo3part2.mp4': 1, 'daughtervideo3part3.mp4': 1, 'sonvideo1.mp4': 1, 'sonvideo2.mp4': 1,
+    'daughtervideo1.mp4': 1, 'daughtervideo3part1.mp4': 1, 'daughtervideo3part2.mp4': 1, 'daughtervideo3part3.mp4': 1, 'sonvideo1.mp4': 1, 'sonvideo2.mp4': 1, 'sonvideo3.mp4': 1,
     'video17.mp4': 1, 'video16.mp4': 1, 'video14.mp4': 1, 'video12.mp4': 1, 'video20.mp4': 1, 'video19.mp4': 1,
     'video15.mp4': 1, 'video18.mp4': 1, 'video13.mp4': 1, 'video11.mp4': 1
   };
@@ -1353,7 +1348,7 @@
     const r = goBtn.getBoundingClientRect(), m = 12, pad = 10;
     const vw = window.innerWidth, vh = window.innerHeight;
     // Never run on top of the dials or the text, so the page stays usable
-    const avoid = [...document.querySelectorAll('#gate .lock-wrap, #gate .gate-title, #gate .gate-sub, #gate .hint-card, #gate .dials, #gate .how, #gate .msg')]
+    const avoid = [...document.querySelectorAll('#gate .lock-wrap, #gate .gate-title, #gate .hint-card, #gate .dials, #gate .msg')]
       .map(e => e.getBoundingClientRect());
     const free = (l, t) => l > m && t > m && l + r.width < vw - m && t + r.height < vh - m &&
       !avoid.some(a => l + r.width > a.left - pad && l < a.right + pad && t + r.height > a.top - pad && t < a.bottom + pad);
@@ -1478,15 +1473,15 @@
 
   // ---------- Unwrapping: the gift opens by itself ----------
   // No question to answer: she already chose to open it by tapping the attachment.
-  const giftbox = $('giftbox'), wTitle = $('wTitle'), wSub = $('wSub');
+  const giftbox = $('giftbox'), wTitle = $('wTitle');
   let unwrapDone = false;
   const toGate = () => { if (!unwrapDone) { unwrapDone = true; show('gate'); } };
 
-  async function swapText(title, sub) {
-    wTitle.style.opacity = wSub.style.opacity = 0;
+  async function swapText(title) {
+    wTitle.style.opacity = 0;
     await wait(260);
-    wTitle.textContent = title; wSub.textContent = sub;
-    wTitle.style.opacity = wSub.style.opacity = 1;
+    wTitle.textContent = title;
+    wTitle.style.opacity = 1;
   }
 
   async function runUnwrap() {
@@ -1501,7 +1496,7 @@
     giftbox.classList.add('open'); giftOpenSound();         // ...the lid and bow pop off
     await wait(900);
     if (unwrapDone) return;
-    await swapText('It is ready for you', 'One last step: enter the password.');
+    await swapText('It is ready for you');
     await wait(2400);
     toGate();
   }
@@ -1863,7 +1858,7 @@
     show('lock');
     await wait(10000);            // a calm moment on the lock screen, then the message arrives
     if (chatOpened) return;
-    $('notif').hidden = false; $('lsHint').hidden = false;
+    $('notif').hidden = false;
     notifTone();
     $('notif').addEventListener('click', openChat);
     await wait(14000);            // if she never taps, carry on anyway (silently)
