@@ -1221,10 +1221,10 @@
   const DAYS = Array.from({ length: 31 }, (_, k) => String(k + 1));
   const YEARS = Array.from({ length: 26 }, (_, k) => String(1950 + k)); // 1950 to 1975
   const dialData = {
-    month: { vals: MONTHS, i: 0,  target: MONTHS.indexOf('November') },
-    day:   { vals: DAYS,   i: 0,  target: DAYS.indexOf('8') },
-    year:  { vals: YEARS,  i: YEARS.indexOf('1958'), target: YEARS.indexOf('1961') }
-  };
+  month: { vals: MONTHS, i: MONTHS.indexOf('November'), target: MONTHS.indexOf('November') },
+  day:   { vals: DAYS,   i: DAYS.indexOf('14'),         target: DAYS.indexOf('8') },
+  year:  { vals: YEARS,  i: YEARS.indexOf('1958'),      target: YEARS.indexOf('1961') }
+};
 
   const lockWrap = $('lockWrap'), msg = $('msg'), goBtn = $('go'), dialsEl = $('dials');
   let unlocked = false;
